@@ -27,13 +27,14 @@ class AdditiveMutation(AbstractMutation):
         self.bound = bound
         self.delta = delta
     
-    def mutation(self, p):
+    def mutation(self, p, p_skill_factor):
         off = p.copy()
+        off_skill_factor = p_skill_factor.copy()
         deltas = np.random.uniform(-self.delta, self.delta, size=p.shape)
         off += deltas
         off[off > self.bound] = self.bound
         off[off < -self.bound] = -self.bound
-        return off
+        return off, off_skill_factor
     
     def __call__(self, p):
         return self.mutation(p)

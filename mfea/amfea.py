@@ -2,6 +2,7 @@ import numpy as np
 from crossover.crossover import AbstractCrossover, ArithmeticCrossover
 from task.task import AbstractTask
 from mutation.mutation import AbstractMutation, AdditiveMutation, RandomMutation
+from rmp.rmp import AbstractRMP, NormalRMP
 from typing import List
 
 class AMFEA:
@@ -11,7 +12,8 @@ class AMFEA:
                  bound,
                  tasks : List[AbstractTask],
                  crossover: AbstractCrossover,
-                 mutation: AbstractMutation):
+                 mutation: AbstractMutation,
+                 ):
         self.pop_size = pop_size
         self.indi_len = indi_len
         self.tasks = tasks
@@ -41,9 +43,9 @@ class AMFEA:
         p2_skill_factor = self.skill_factor[p2_indices]
         
         p1_fitness = self.fitness[p1_indices]
-        p2_fitness = self.fitness[p2_fitness]
+        p2_fitness = self.fitness[p2_indices]
 
-        
+
 
 
     def fit(self, num_gen, llm_rate):
