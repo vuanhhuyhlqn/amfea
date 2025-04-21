@@ -13,6 +13,7 @@ class AMFEA:
                  tasks : List[AbstractTask],
                  crossover: AbstractCrossover,
                  mutation: AbstractMutation,
+                 rmp: AbstractRMP
                  ):
         self.pop_size = pop_size
         self.indi_len = indi_len
