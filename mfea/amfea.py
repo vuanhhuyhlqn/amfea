@@ -19,12 +19,11 @@ class AMFEA:
             self.skill_factor[i] = i % self.num_tasks
 
         self.fitness = np.zeros(self.pop_size)
-        print(len(tasks))
 
         for task_id in range(len(tasks)):
-            print(task_id)
-
             task_mask = self.skill_factor == task_id
             self.fitness[task_mask] = tasks[task_id].fitness(self.pop[task_mask])
 
-    
+    def run(self, num_gen):
+        for gen in range(num_gen):
+            pass
