@@ -18,6 +18,7 @@ class AMFEA:
         self.bound = bound
         self.num_tasks = len(tasks)
         self.crossover = crossover
+        self.mutation = mutation
 
         self.pop = np.random.uniform(-self.bound, self.bound, size=(self.pop_size, self.indi_len))
         self.skill_factor = np.zeros(pop_size, dtype=int)
@@ -31,6 +32,20 @@ class AMFEA:
             task_mask = self.skill_factor == task_id
             self.fitness[task_mask] = tasks[task_id].fitness(self.pop[task_mask])
 
-    def run(self, num_gen):
+    def evolve(self):
+        num_pair = np.random.randint(0, self.pop_size)
+        p1_indices = np.random.randint(0, self.pop_size, size=num_pair)
+        p2_indices = np.random.randint(0, self.pop_size, size=num_pair)
+        
+        p1_skill_factor = self.skill_factor[p1_indices]
+        p2_skill_factor = self.skill_factor[p2_indices]
+        
+        p1_fitness = self.fitness[p1_indices]
+        p2_fitness = self.fitness[p2_fitness]
+
+        
+
+
+    def fit(self, num_gen, llm_rate):
         for gen in range(num_gen):
             pass
