@@ -48,8 +48,6 @@ class AMFEA:
         p2_fitness = self.fitness[p2_indices]
 
 
-
-
     def fit(self, num_gen, llm_rate):
         for gen in range(num_gen):
             pass

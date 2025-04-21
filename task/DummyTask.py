@@ -1,3 +1,4 @@
+import numpy as np
 from .AbstractTask import AbstractTask
 
 class DummyTask(AbstractTask):
