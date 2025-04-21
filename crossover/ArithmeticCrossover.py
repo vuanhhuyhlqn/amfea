@@ -1,10 +1,5 @@
 import numpy as np
-
-class AbstractCrossover:
-	def __init__(self):
-		pass
-	def __call__(self, rmp, p1, p2, p1_skill_factor, p2_skill_factor):
-		pass
+from .AbstractCrossover import AbstractCrossover
 
 class ArithmeticCrossover(AbstractCrossover):
 	def __init__(self):
@@ -21,4 +16,4 @@ class ArithmeticCrossover(AbstractCrossover):
 		return off, off_skill_factor
 
 	def __call__(self, rmp, p1, p2, p1_skill_factor, p2_skill_factor):
-		return self.crossover(rmp, p1, p2)
+		return self.crossover(rmp, p1, p2, p1_skill_factor, p2_skill_factor)
