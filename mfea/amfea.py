@@ -1,10 +1,17 @@
 import numpy as np
 from crossover.crossover import AbstractCrossover, ArithmeticCrossover
 from task.task import AbstractTask
+from mutation.mutation import AbstractMutation, AdditiveMutation, RandomMutation
 from typing import List
 
 class AMFEA:
-    def __init__(self, pop_size, indi_len, bound, tasks : List[AbstractTask], crossover: AbstractCrossover):
+    def __init__(self,
+                 pop_size,
+                 indi_len,
+                 bound,
+                 tasks : List[AbstractTask],
+                 crossover: AbstractCrossover,
+                 mutation: AbstractMutation):
         self.pop_size = pop_size
         self.indi_len = indi_len
         self.tasks = tasks
