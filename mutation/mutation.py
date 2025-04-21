@@ -21,3 +21,19 @@ class RandomMutation(AbstractMutation):
 
     def __call__(self, p):
         return self.mutation(p)
+    
+class AdditiveMutation(AbstractMutation):
+    def __init__(self, bound, delta):
+        self.bound = bound
+        self.delta = delta
+    
+    def mutation(self, p):
+        off = p.copy()
+        deltas = np.random.uniform(-self.delta, self.delta, size=p.shape)
+        off += deltas
+        off[off > self.bound] = self.bound
+        off[off < -self.bound] = -self.bound
+        return off
+    
+    def __call__(self, p):
+        return self.mutation(p)
