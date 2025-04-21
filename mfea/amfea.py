@@ -1,8 +1,9 @@
 import numpy as np
-from crossover.crossover import AbstractCrossover, ArithmeticCrossover
-from task.task import AbstractTask
-from mutation.AdditiveMutation import AbstractMutation, AdditiveMutation, RandomMutation
-from rmp.rmp import AbstractRMP, NormalRMP
+import numpy as np
+from mutation import *
+from crossover import *
+from rmp import *
+from task import *
 from typing import List
 
 class AMFEA:
