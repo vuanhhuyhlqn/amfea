@@ -5,6 +5,7 @@ from crossover import *
 from rmp import *
 from task import *
 from typing import List
+import time
 
 class AMFEA:
     def __init__(self,
