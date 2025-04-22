@@ -23,6 +23,7 @@ class AMFEA:
         self.num_tasks = len(tasks)
         self.crossover = crossover
         self.mutation = mutation
+        self.rmp = rmp
 
         self.pop = np.random.uniform(-self.bound, self.bound, size=(self.pop_size, self.indi_len))
         self.skill_factor = np.zeros(pop_size, dtype=int)
@@ -82,7 +83,7 @@ class AMFEA:
         #Mutation
         num_mutation = np.random.randint(0, int(self.pop_size) / 2)
         off_mut, off_mut_skill_factor, off_mut_fitness = self.get_random_individuals(num_mutation)
-        off_mut = self.mutation(off_mut)
+        off_mut, off_mut_skill_factor = self.mutation(off_mut, off_mut_skill_factor)
         
         #Calculate mutation offsprings fitness
         for task_id in range(self.num_tasks):
@@ -92,6 +93,9 @@ class AMFEA:
         ipop = np.concatenate([self.pop, off, off_mut])
         iskill_factor = np.concatenate([self.skill_factor, off_skill_factor, off_mut_skill_factor])
         ifitness = np.concatenate([self.fitness, off_fitness, off_mut_fitness])
+
+        # print(ipop)
+        # print(ifitness)
 
         self.pop = np.array([]).reshape(0, self.indi_len)
         self.fitness = []
@@ -104,22 +108,33 @@ class AMFEA:
             tpop = ipop[task_mask]
             tfitness = ifitness[task_mask]
             assert(len(tpop) == len(tfitness))
+
+            survive_indices = np.argpartition(tfitness, survive_size - 1)[:survive_size]
             
             self.best_fitness[task_id] = np.min(tfitness[survive_indices])
             self.mean_fitness[task_id] = np.mean(tfitness[survive_indices])
 
-            survive_indices = np.argpartition(tfitness, survive_size - 1)[:survive_size]
             self.pop = np.concatenate([self.pop, tpop[survive_indices]])
             self.fitness = np.concatenate([self.fitness, tfitness[survive_indices]])
             self.skill_factor = np.concatenate([self.skill_factor, np.full(survive_size, task_id)])
 
 
-    def fit(self, num_gen, llm_rate=None):
-        for gen in range(num_gen):
+    def fit(self, num_gen, monitor_rate=10, llm_rate=0):
+        #History Data
+        bfs = np.zeros(shape=(self.num_tasks, num_gen + 1))
+        mfs = np.zeros(shape=(self.num_tasks, num_gen + 1))
+
+        for gen in range(num_gen + 1):
             self.evolve()
-            print("Gen {0}".format(gen))
             for task_id in range(self.num_tasks):
-                print("Task {0}:".format(task_id))
-                print("Best Fitness: {0}".format(self.best_fitness[task_id]))
-                print("Mean Fitness: {0}\n".format(self.mean_fitness[task_id]))
-            
+                bfs[task_id][gen] = self.best_fitness[task_id]
+                mfs[task_id][gen] = self.mean_fitness[task_id]
+
+            if gen % monitor_rate == 0:
+                print("Gen {0}".format(gen))
+                for task_id in range(self.num_tasks):
+                    print("Task {0}:".format(task_id))
+                    print("Best Fitness: {0}".format(self.best_fitness[task_id]))
+                    print("Mean Fitness: {0}\n".format(self.mean_fitness[task_id]))
+
+        return bfs, mfs

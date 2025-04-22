@@ -6,4 +6,4 @@ class DummyTask(AbstractTask):
         super().__init__()
 
     def fitness(self, p):
-        return np.sum(p, axis=1)
+        return np.sum(np.cumsum(p, axis=1), axis=1)
