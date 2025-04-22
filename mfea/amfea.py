@@ -120,7 +120,7 @@ class AMFEA:
             self.skill_factor = np.concatenate([self.skill_factor, np.full(survive_size, task_id)])
         
 
-    def fit(self, num_gen, monitor_rate=10, llm_rate=0):
+    def fit(self, num_gen, monitor=False, monitor_rate=10, llm_rate=0):
         #History Data
         bfs = np.zeros(shape=(self.num_tasks, num_gen + 1))
         mfs = np.zeros(shape=(self.num_tasks, num_gen + 1))
@@ -135,9 +135,10 @@ class AMFEA:
 
             if gen % monitor_rate == 0:
                 print("Gen {0}".format(gen))
-                for task_id in range(self.num_tasks):
-                    print("Task {0}:".format(task_id))
-                    print("Best Fitness: {0}".format(self.best_fitness[task_id]))
-                    print("Mean Fitness: {0}".format(self.mean_fitness[task_id]))
+                if monitor:
+                    for task_id in range(self.num_tasks):
+                        print("Task {0}:".format(task_id))
+                        print("Best Fitness: {0}".format(self.best_fitness[task_id]))
+                        print("Mean Fitness: {0}".format(self.mean_fitness[task_id]))
                 print("Time taken: %.2f seconds\n" % (end_time - start_time))
         return bfs, mfs
