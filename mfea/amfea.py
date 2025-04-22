@@ -67,7 +67,7 @@ class AMFEA:
         return p, p_skill_factor, p_fitness
 
     def evolve(self):
-        num_pair = np.random.randint(0, int(self.pop_size / 2))
+        num_pair = np.random.randint(0, int(self.pop_size / 3))
         p1, p2, p1_skill_factor, p2_skill_factor, p1_fitness, p2_fitness = self.get_random_parents(num_pair)
         #Adaptive RMP
         armp = self.rmp(p1, p2, p1_skill_factor, p2_skill_factor, p1_fitness, p2_fitness)
@@ -82,7 +82,7 @@ class AMFEA:
             off_fitness[task_mask] = self.tasks[task_id].fitness(off[task_mask])
 
         #Mutation
-        num_mutation = np.random.randint(0, int(self.pop_size) / 2)
+        num_mutation = np.random.randint(0, int(self.pop_size) / 3)
         off_mut, off_mut_skill_factor, off_mut_fitness = self.get_random_individuals(num_mutation)
         off_mut, off_mut_skill_factor = self.mutation(off_mut, off_mut_skill_factor)
         
@@ -118,7 +118,7 @@ class AMFEA:
             self.pop = np.concatenate([self.pop, tpop[survive_indices]])
             self.fitness = np.concatenate([self.fitness, tfitness[survive_indices]])
             self.skill_factor = np.concatenate([self.skill_factor, np.full(survive_size, task_id)])
-
+        
 
     def fit(self, num_gen, monitor_rate=10, llm_rate=0):
         #History Data
@@ -126,7 +126,9 @@ class AMFEA:
         mfs = np.zeros(shape=(self.num_tasks, num_gen + 1))
 
         for gen in range(num_gen + 1):
+            start_time = time.time()
             self.evolve()
+            end_time = time.time()
             for task_id in range(self.num_tasks):
                 bfs[task_id][gen] = self.best_fitness[task_id]
                 mfs[task_id][gen] = self.mean_fitness[task_id]
@@ -136,6 +138,6 @@ class AMFEA:
                 for task_id in range(self.num_tasks):
                     print("Task {0}:".format(task_id))
                     print("Best Fitness: {0}".format(self.best_fitness[task_id]))
-                    print("Mean Fitness: {0}\n".format(self.mean_fitness[task_id]))
-
+                    print("Mean Fitness: {0}".format(self.mean_fitness[task_id]))
+                print("Time taken: %.2f seconds\n" % (end_time - start_time))
         return bfs, mfs

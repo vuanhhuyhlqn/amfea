@@ -4,10 +4,14 @@ from .AbstractCrossover import AbstractCrossover
 class BLXCrossover(AbstractCrossover):
 	def __init__(self, alpha=0.5):
 		self.alpha = alpha
-
+		
 	def crossover(self, rmp, p1, p2, p1_skill_factor, p2_skill_factor):
 		assert(len(rmp) == len(p1) and len(rmp) == len(p2))
+		assert(rmp.shape == p1_skill_factor.shape)
+		assert(rmp.shape == p2_skill_factor.shape)
+
 		rnd = np.random.uniform(size = rmp.shape)
+		rnd[p1_skill_factor == p2_skill_factor] = 0.0
 		crossover_indices = np.where(rnd < rmp)[0]
 
 		_p1 = p1[crossover_indices]
