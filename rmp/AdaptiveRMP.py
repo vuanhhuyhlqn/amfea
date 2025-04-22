@@ -1,12 +1,12 @@
 import numpy as np
 from .AbstractRMP import AbstractRMP
 from llm import *
-# from dotenv import load_dotenv
+from dotenv import load_dotenv
 import os
 
-# load_dotenv()
+load_dotenv()
 
-DEEPSEEK_API_KEY = "sk-505a4ff57cfb432d8888a3d8d66a3133"
+DEEPSEEK_API_KEY = os.getenv("DEEPSEEK_API_KEY")
 
 deepseek = DeepseekModel(DEEPSEEK_API_KEY, "deepseek-chat", 1.0)
 class IndividualRMP:
