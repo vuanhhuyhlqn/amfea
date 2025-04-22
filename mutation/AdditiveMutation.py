@@ -2,7 +2,7 @@ import numpy as np
 from .AbstractMutation import AbstractMutation
     
 class AdditiveMutation(AbstractMutation):
-    def __init__(self, bound, delta):
+    def __init__(self, bound=0, delta=0):
         self.bound = bound
         self.delta = delta
     
