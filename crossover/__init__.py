@@ -1,2 +1,3 @@
 from .AbstractCrossover import AbstractCrossover
 from .ArithmeticCrossover import ArithmeticCrossover
+from .BLXCrossover import BLXCrossover
