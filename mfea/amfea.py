@@ -65,15 +65,12 @@ class AMFEA:
         p_fitness = self.fitness[p_indices]
         return p, p_skill_factor, p_fitness
 
-    def evolve(self, gen, armp_before, llm_rate, num_pop_test_case=100):
+    def evolve(self, llm_rate, num_pop_test_case=100):
         num_pair = np.random.randint(0, int(self.pop_size / 3))
         p1, p2, p1_skill_factor, p2_skill_factor, p1_fitness, p2_fitness = self.get_random_parents(num_pair)
         #Adaptive RMP
-        if gen != 0:
-            armp = armp_before
 
-        if gen % llm_rate == 0:
-            armp = self.rmp(p1, p2, p1_skill_factor, p2_skill_factor, p1_fitness, p2_fitness)
+        armp = self.rmp(p1, p2, p1_skill_factor, p2_skill_factor, p1_fitness, p2_fitness)
         
         #Crossover
         off, off_skill_factor = self.crossover(armp, p1, p2, p1_skill_factor, p2_skill_factor)
@@ -121,19 +118,15 @@ class AMFEA:
             self.pop = np.concatenate([self.pop, tpop[survive_indices]])
             self.fitness = np.concatenate([self.fitness, tfitness[survive_indices]])
             self.skill_factor = np.concatenate([self.skill_factor, np.full(survive_size, task_id)])
-
-        return armp
         
     def fit(self, num_gen, monitor=False, monitor_rate=10, llm_rate=100):
         #History Data
         bfs = np.zeros(shape=(self.num_tasks, num_gen + 1))
         mfs = np.zeros(shape=(self.num_tasks, num_gen + 1))
 
-        armp_before = np.zeros(self.indi_len, dtype=np.float32)
-
         for gen in range(num_gen + 1):
             start_time = time.time()
-            armp_before = self.evolve(gen, armp_before, llm_rate)
+            self.evolve(gen, llm_rate)
             end_time = time.time()
             for task_id in range(self.num_tasks):
                 bfs[task_id][gen] = self.best_fitness[task_id]
