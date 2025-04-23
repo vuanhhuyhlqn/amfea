@@ -26,13 +26,10 @@ class IndividualRMP:
                 exec(rmp_function, f)
                 rmp = f["get_rmp"](p1, p2, p1_skill_factor, p2_skill_factor, p1_fitness, p2_fitness)
                 rmp = np.array(rmp)
+                print("p1 shape: ", p1.shape)
                 print(f"RMP shape: {rmp.shape}")
-                print(f"RMP array:\n {rmp}")
-                if len(rmp) == len(p1):
-                    self.code = rmp_function
-                    break
-                else:
-                    print("Invalid RMP array shape or type.")
+                self.code = rmp_function
+                break
             except Exception as e:
                 print(f"Error in create rmp array: {e}")
 
@@ -56,6 +53,7 @@ class PopulationRMP:
 class AdaptiveRMP(AbstractRMP):
     def __init__(self, rmp_pop_size, num_gen, pc, pm):
         self.rmp_pop_size = rmp_pop_size
+        self.rmp_pop = PopulationRMP(self.rmp_pop_size)
         self.num_gen = num_gen
         self.pc = pc
         self.pm = pm
@@ -63,12 +61,12 @@ class AdaptiveRMP(AbstractRMP):
 
     def get_rmp(self, p1, p2, p1_skill_factor, p2_skill_factor, p1_fitness, p2_fitness, gen_mfea, llm_rate, tasks):
         if gen_mfea % llm_rate == 0:
-            pop_rmp = PopulationRMP(self.rmp_pop_size)
-            pop_rmp.gen_pop(p1, p2, p1_skill_factor, p2_skill_factor, p1_fitness, p2_fitness, tasks)
+            if gen_mfea == 0:
+                self.rmp_pop.gen_pop(p1, p2, p1_skill_factor, p2_skill_factor, p1_fitness, p2_fitness, tasks)
             for gen in range(self.num_gen):
                 off_list = []
                 for i in range(self.rmp_pop_size):
-                    p1, p2 = np.random.choice(pop_rmp.individuals, 2)
+                    p1, p2 = np.random.choice(self.rmp_pop.individuals, 2)
                     if np.random.rand() < self.pc:
                         off_idea = deepseek.crossover(p1.idea, p2.idea, p1.performance, p2.performance)
                         crossover_individual = IndividualRMP(off_idea)
@@ -90,11 +88,11 @@ class AdaptiveRMP(AbstractRMP):
                         off_individual.performance = individual_performance
                         off_list.append(off_individual)
 
-                pop_rmp.individuals.extend(off_list)
-                pop_rmp.individuals.sort(key=lambda x: x.performance, reverse=True)
-                pop_rmp.individuals = pop_rmp.individuals[:self.rmp_pop_size]
+                self.rmp_pop.individuals.extend(off_list)
+                self.rmp_pop.individuals.sort(key=lambda x: x.performance, reverse=True)
+                self.rmp_pop.individuals = self.rmp_pop.individuals[:self.rmp_pop_size]
 
-            best_individual = pop_rmp.individuals[0]
+            best_individual = self.rmp_pop.individuals[0]
             self.function = best_individual.code
         
         f = {}
