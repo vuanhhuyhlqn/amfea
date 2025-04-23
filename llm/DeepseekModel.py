@@ -65,6 +65,8 @@ class DeepseekModel(AbstractModel):
             temperature=self.temperature,
         )
 
+        print("Response: ", response.choices[0].message.content)
+
         code = extract_code(response.choices[0].message.content)
         return code
     
