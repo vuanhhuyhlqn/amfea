@@ -119,7 +119,7 @@ class AMFEA:
             self.fitness = np.concatenate([self.fitness, tfitness[survive_indices]])
             self.skill_factor = np.concatenate([self.skill_factor, np.full(survive_size, task_id)])
         
-    def fit(self, num_gen, monitor=False, monitor_rate=10, llm_rate=100):
+    def fit(self, num_gen, monitor=False, monitor_rate=10, llm_rate=1000):
         #History Data
         bfs = np.zeros(shape=(self.num_tasks, num_gen + 1))
         mfs = np.zeros(shape=(self.num_tasks, num_gen + 1))
