@@ -3,6 +3,7 @@ import re
 init_idea_text = open("llm/prompts2/init_idea.txt", "r").read()
 gen_function_text = open("llm/prompts2/gen_function.txt", "r").read()
 reflect_text = open("llm/prompts2/reflect.txt", "r").read()
+mutation_text = open("llm/prompts2/mutation.txt", "r").read()
 
 def split_sentences(text):
     lines = text.strip().split('\n')
@@ -53,6 +54,21 @@ class DeepsekModel2:
         for idea in ideas1:
             ideas1_text += idea + "\n"
         prompt = reflect_text.format(ideas1_text, ideas2_text, per1, per2)
+        client = OpenAI(api_key=self.API_KEY, base_url="https://api.deepseek.com")
+        response = client.chat.completions.create(
+            model="deepseek-chat",
+            messages=[
+                {"role": "user", "content": prompt},
+            ],
+            stream=False
+        )
+        return split_sentences(response.choices[0].message.content)
+    
+    def mutation(self, ideas, per):
+        ideas_text = ""
+        for idea in ideas:
+            ideas_text += idea + "\n"
+        prompt = mutation_text.format(ideas_text, per)
         client = OpenAI(api_key=self.API_KEY, base_url="https://api.deepseek.com")
         response = client.chat.completions.create(
             model="deepseek-chat",
