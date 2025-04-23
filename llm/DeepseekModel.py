@@ -13,6 +13,9 @@ crossover_text = crossover_file.read()
 mutation_file = open("llm/prompts/mutation.txt", "r")
 mutation_text = mutation_file.read()
 
+reverse_file = open("llm/prompts/reverse.txt", "r")
+reverse_text = reverse_file.read()
+
 def split_prompts_deekseek(response):
     descriptions = [line.strip() for line in response.strip().split('\n') if line.strip()]
     ideas = []
@@ -20,11 +23,9 @@ def split_prompts_deekseek(response):
         ideas.append(desc)
     return ideas
 
-def extract_code_from_markdown(response):
-    if response.startswith("```python"):
-        response = response[len("```python"):].strip()
-    if response.endswith("```"):
-        response = response[:-len("```")].strip()
+def extract_code(response):
+    if response.startswith("<") and response.endswith(">"):
+        response = response[1:-1].strip()
     return response
 
 class DeepseekModel(AbstractModel):
@@ -50,9 +51,6 @@ class DeepseekModel(AbstractModel):
             messages=self.messages,
             temperature=self.temperature,
         )
-
-        print("Response: ", response.choices[0].message.content)
-
         ideas = split_prompts_deekseek(response.choices[0].message.content)
 
         return ideas
@@ -67,5 +65,41 @@ class DeepseekModel(AbstractModel):
             temperature=self.temperature,
         )
 
-        code = response.choices[0].message.content.strip()
-        return extract_code_from_markdown(code)
+        code = extract_code(response.choices[0].message.content)
+        return code
+    
+    def crossover(self, p1_idea, p2_idea, p1_performance, p2_performance):
+        crossover_prompt = crossover_text.format(p1_idea, p1_performance, p2_idea, p2_performance)
+
+        self.messages.append({"role": "user", "content": crossover_prompt})
+        response = self.client.chat.completions.create(
+            model=self.model,
+            messages=self.messages,
+            temperature=self.temperature,
+        )
+
+        return response.choices[0].message.content.strip()
+    
+    def mutation(self, idea, performance):
+        mutation_prompt = mutation_text.format(idea, performance)
+
+        self.messages.append({"role": "user", "content": mutation_prompt})
+        response = self.client.chat.completions.create(
+            model=self.model,
+            messages=self.messages,
+            temperature=self.temperature,
+        )
+
+        return response.choices[0].message.content.strip()
+    
+    def reverse(self, idea):
+        reverse_prompt = reverse_text.format(idea)
+
+        self.messages.append({"role": "user", "content": reverse_prompt})
+        response = self.client.chat.completions.create(
+            model=self.model,
+            messages=self.messages,
+            temperature=self.temperature,
+        )
+
+        return response.choices[0].message.content.strip()
