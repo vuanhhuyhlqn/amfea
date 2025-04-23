@@ -33,8 +33,8 @@ class BLXCrossover(AbstractCrossover):
 				task_mask = off_skill_factor == task_id
 				off_fitness[task_mask] = tasks[task_id].fitness(off[task_mask]) 
 				p_fitness = tasks[task_id].fitness(_p1[task_mask])
-				print(off_fitness[task_mask])
-				print(p_fitness)
+				# print(off_fitness[task_mask])
+				# print(p_fitness)
 				better_off_cnt += np.sum(off_fitness[task_mask] > p_fitness)
 			return off, off_skill_factor, better_off_cnt
 
