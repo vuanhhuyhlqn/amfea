@@ -1,0 +1,4 @@
+I using MFEA algorithm to optimize a set of different tasks. Help me create a function to generate Random Mating Probability for crossover process. This function is called 'get_rmp' that take 4 inputs: 'p1', 'p2', 'p1_skill_factor', 'p2_skill_factor' where 'p1', 'p2' are the parents of the crossover process, 'p1_skill_factor', 'p2_skill_factor' are the skill factors of 2 parent. All are numpy arrays. This function return 'rmp', a 1 dimensional numpy array with same length as 'p1', this is the Random Mating Probability between 'p1', 'p2' in the crossover process.
+The function should follow these guide lines:
+{0}
+Just provide only the code, without comment and no further explain.

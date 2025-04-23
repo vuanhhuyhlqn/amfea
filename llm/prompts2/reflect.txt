@@ -1,0 +1,15 @@
+I using MFEA algorithm to optimize a set of different tasks. These are the two strategies i used to create a function that generates Random Mating Probability for crossover process and their performace.
+Strategy 1:
+{0}
+Strategy 1 performance: {1}
+Strategy 2:
+{2}
+Strategy 2 performance: {3}
+The performance of a strategy is the percentage of offsprings that have better fitness than their parents.
+Analyze these strategies and the differences between their performances and give me a new strategy to create the mentioned function. A strategy should be in the form of 4 guide lines for the function. 
+The response format should be as follow:
+1. <Guide Lines 1>
+2. <Guide Lines 2>
+3. <Guide Lines 3>
+4. <Guide Lines 4>
+Follow the format and do not give any further explain
