@@ -65,12 +65,12 @@ class AMFEA:
         p_fitness = self.fitness[p_indices]
         return p, p_skill_factor, p_fitness
 
-    def evolve(self, llm_rate, num_pop_test_case=100):
+    def evolve(self, gen, llm_rate):
         num_pair = np.random.randint(0, int(self.pop_size / 3))
         p1, p2, p1_skill_factor, p2_skill_factor, p1_fitness, p2_fitness = self.get_random_parents(num_pair)
         #Adaptive RMP
 
-        armp = self.rmp(p1, p2, p1_skill_factor, p2_skill_factor, p1_fitness, p2_fitness)
+        armp = self.rmp(p1, p2, p1_skill_factor, p2_skill_factor, p1_fitness, p2_fitness, gen, llm_rate, self.tasks)
         
         #Crossover
         off, off_skill_factor = self.crossover(armp, p1, p2, p1_skill_factor, p2_skill_factor)
