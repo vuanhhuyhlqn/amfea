@@ -1,0 +1,6 @@
+I'm using MFEA algorithm to optimize a set of different tasks. I'm trying to write a function that generate Random Mating Probability for crossover process. Help me generate 4 guide lines that you think this function should follow to generate good Random Mating Probability. The response format should be as follow:
+1. <Guide Lines 1>
+2. <Guide Lines 2>
+3. <Guide Lines 3>
+4. <Guide Lines 4>
+Follow the format and do not give any further explain

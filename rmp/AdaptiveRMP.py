@@ -28,19 +28,8 @@ class IndividualRMP:
                 rmp = np.array(rmp)
                 print("p1 shape: ", p1.shape)
                 print(f"RMP shape: {rmp.shape}")
-<<<<<<< HEAD
-                print(f"RMP array:\n {rmp}")
-                print("here")
-                print(len(rmp))
-                if len(rmp) == len(p1):
-                    self.code = rmp_function
-                    break
-                else:
-                    print("Invalid RMP array shape or type.")
-=======
                 self.code = rmp_function
                 break
->>>>>>> 4b173e03b799c2a6a6ab47abf01abdc69872f711
             except Exception as e:
                 print(f"Error in create rmp array: {e}")
 
