@@ -20,33 +20,21 @@ class IndividualRMP:
         while True:
             rmp_function = deepseek.idea_to_code_function(self.idea)
             rmp_function = "import numpy as np\n" + rmp_function
-            print(f"RMP function:\n {rmp_function}")
             try:
                 f = {}
                 exec(rmp_function, f)
                 rmp = f["get_rmp"](p1, p2, p1_skill_factor, p2_skill_factor, p1_fitness, p2_fitness)
                 rmp = np.array(rmp)
-                print("p1 shape: ", p1.shape)
-                print(f"RMP shape: {rmp.shape}")
-<<<<<<< HEAD
-                print(f"RMP array:\n {rmp}")
-                print("here")
-                print(len(rmp))
-                if len(rmp) == len(p1):
-                    self.code = rmp_function
-                    break
-                else:
-                    print("Invalid RMP array shape or type.")
-=======
                 self.code = rmp_function
                 break
->>>>>>> 4b173e03b799c2a6a6ab47abf01abdc69872f711
             except Exception as e:
                 print(f"Error in create rmp array: {e}")
 
         crossover = BLXCrossover()
         _, _, better_off_cnt = crossover(rmp, p1, p2, p1_skill_factor, p2_skill_factor, eval=True, tasks=tasks)
+        print(f"Better off count: {better_off_cnt}")
         self.performance = better_off_cnt / len(p1)
+        print(f"Performance: {self.performance}")
 
         return self.performance
 class PopulationRMP:
@@ -77,12 +65,12 @@ class AdaptiveRMP(AbstractRMP):
             for gen in range(self.num_gen):
                 off_list = []
                 for i in range(self.rmp_pop_size):
-                    p1, p2 = np.random.choice(self.rmp_pop.individuals, 2)
+                    par1, par2 = np.random.choice(self.rmp_pop.individuals, 2)
                     if np.random.rand() < self.pc:
-                        off_idea = deepseek.crossover(p1.idea, p2.idea, p1.performance, p2.performance)
+                        off_idea = deepseek.crossover(par1.idea, par2.idea, par1.performance, par2.performance)
                         crossover_individual = IndividualRMP(off_idea)
                         individual_performance = crossover_individual.evaluate(p1, p2, p1_skill_factor, p2_skill_factor, p1_fitness, p2_fitness, tasks)
-                        if crossover_individual.performance >= p1.performance or crossover_individual.performance >= p2.performance:
+                        if crossover_individual.performance >= par1.performance or crossover_individual.performance >= par2.performance:
                             off_list.append(crossover_individual)
                         else:
                             off_idea = deepseek.reverse(off_idea)
