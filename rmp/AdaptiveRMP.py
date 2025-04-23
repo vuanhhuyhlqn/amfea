@@ -28,6 +28,8 @@ class IndividualRMP:
                 rmp = np.array(rmp)
                 print(f"RMP shape: {rmp.shape}")
                 print(f"RMP array:\n {rmp}")
+                print("here")
+                print(len(rmp))
                 if len(rmp) == len(p1):
                     self.code = rmp_function
                     break
