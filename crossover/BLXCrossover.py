@@ -17,9 +17,12 @@ class BLXCrossover(AbstractCrossover):
 		
 		d = np.abs(_p1 - _p2)
 		low_bounds = np.minimum(_p1, _p2) - self.alpha * d
+		low_bounds[low_bounds < 0] = 0
 		high_bounds = np.maximum(_p1, _p2) + self.alpha * d
+		high_bounds[high_bounds > 1] = 1
 
 		off = np.random.uniform(low_bounds, high_bounds, size=_p1.shape)
+		
 		off_skill_factor = p1_skill_factor[crossover_indices]
     
 		if eval:
