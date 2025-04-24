@@ -2,13 +2,12 @@ import numpy as np
 from .AbstractMutation import AbstractMutation
 
 class PolynomialMutation(AbstractMutation):
-	def __init__(self, eta_m, bound):
+	def __init__(self, eta_m):
 		self.eta_m = eta_m
-		self.bound = bound
 	def polynomial_mutation(self, p, p_skill_factor):
 		n_pop, n_var = p.shape
-		lower_bound = -self.bound
-		upper_bound = self.bound
+		lower_bound = 0
+		upper_bound = 1
 		mutated_p = p.copy()
 		u = np.random.random((n_pop, n_var))
 		delta = np.where(
