@@ -10,11 +10,9 @@ class CEC17Task(AbstractTask):
         self.bound = bound
 
     def fitness(self, p):
-        # for x in self.bound_decode(p, self.bound, dim=50):
-        #     print(self.func(x))
-        return np.array([self.func(x) for x in self.bound_decode(p, self.bound, dim=50)])    
+        return np.array([self.func(x) for x in self.bound_decode(p, self.bound, dim=self.func.dim)])    
 
-def get_10_tasks() -> List[AbstractFunc]:
+def get_10_tasks() -> List[AbstractTask]:
     griewank_shift = np.zeros(50)
     griewank_shift[:25] = -80
     griewank_shift[25:] = 80
@@ -28,6 +26,7 @@ def get_10_tasks() -> List[AbstractFunc]:
         CEC17Task(Weierstrass(25, np.full(25, -0.4)), 0.5),
         CEC17Task(Rosenbrock(50, np.full(50, -1)), 50),
         CEC17Task(Ackley(50, np.full(50, 40)), 50),
+        CEC17Task(Weierstrass(50, np.full(50, -0.4)), 0.5),
         CEC17Task(Schwefel(50, np.full(50, 0)), 500),
         CEC17Task(Griewank(50, griewank_shift), 100),
         CEC17Task(Rastrigin(50, rastrigin_shift), 50),
