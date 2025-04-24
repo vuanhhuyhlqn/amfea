@@ -64,7 +64,6 @@ class DeepseekModel(AbstractModel):
 
         ideas = split_prompts_deekseek(response.choices[0].message.content)
 
-
         return ideas
     
     def idea_to_code_function(self, idea):

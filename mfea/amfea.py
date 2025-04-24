@@ -72,7 +72,7 @@ class AMFEA:
 
         armp = self.rmp(p1, p2, p1_skill_factor, p2_skill_factor, p1_fitness, p2_fitness, gen, llm_rate, self.tasks)
         
-        #Crossover
+        #Crossover 
         off, off_skill_factor = self.crossover(armp, p1, p2, p1_skill_factor, p2_skill_factor)
         off_fitness = np.zeros(len(off), dtype=np.float32)
 

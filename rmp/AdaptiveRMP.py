@@ -19,6 +19,7 @@ class IndividualRMP:
     def evaluate(self, p1, p2, p1_skill_factor, p2_skill_factor, p1_fitness, p2_fitness, tasks):
         rmp_function = deepseek.idea_to_code_function(self.idea)
         rmp_function = "import numpy as np\n" + rmp_function
+        print(f"RMP function: {rmp_function}")
         try:
             f = {}
             exec(rmp_function, f)
@@ -52,7 +53,6 @@ class AdaptiveRMP(AbstractRMP):
     def __init__(self, rmp_pop_size, num_gen, pc, pm):
         self.rmp_pop_size = rmp_pop_size
         self.rmp_pop = PopulationRMP(self.rmp_pop_size)
-        self.num_gen = num_gen
         self.pc = pc
         self.pm = pm
         self.function = None
@@ -76,7 +76,7 @@ class AdaptiveRMP(AbstractRMP):
                     off_list.append(reversed_individual)
 
                 if np.random.rand() < self.pm:
-                    off_idea = deepseek.mutation(off_idea, off_individual.performance)
+                    off_idea = deepseek.mutation(off_idea, off_idea.performance)
                     mutation_individual = IndividualRMP(off_idea)
                     individual_performance = mutation_individual.evaluate(p1, p2, p1_skill_factor, p2_skill_factor, p1_fitness, p2_fitness, tasks)
 
