@@ -7,8 +7,6 @@ class BLXCrossover(AbstractCrossover):
 		
 	def crossover(self, rmp, p1, p2, p1_skill_factor, p2_skill_factor, eval=False, tasks=None):
 		assert(len(rmp) == len(p1) and len(rmp) == len(p2))
-		assert(rmp.shape == p1_skill_factor.shape)
-		assert(rmp.shape == p2_skill_factor.shape)
 
 		rnd = np.random.uniform(size = rmp.shape)
 		rnd[p1_skill_factor == p2_skill_factor] = 0.0
