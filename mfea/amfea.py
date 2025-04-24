@@ -10,7 +10,6 @@ class AMFEA:
     def __init__(self,
                  num_indis_per_task,
                  indi_len,
-                 bound,
                  tasks : List[AbstractTask],
                  crossover: AbstractCrossover,
                  mutation: AbstractMutation,
@@ -18,14 +17,12 @@ class AMFEA:
                  ):
         self.indi_len = indi_len
         self.tasks = tasks
-        self.bound = bound
         self.num_tasks = len(tasks)
         self.pop_size = num_indis_per_task * self.num_tasks
         self.crossover = crossover
         self.mutation = mutation
         self.rmp = rmp
-
-        self.pop = np.random.uniform(-self.bound, self.bound, size=(self.pop_size, self.indi_len))
+        self.pop = np.random.uniform(size=(self.pop_size, self.indi_len))
         self.skill_factor = np.zeros(self.pop_size, dtype=int)
 
         for i in range(self.pop_size):
@@ -119,7 +116,7 @@ class AMFEA:
             self.fitness = np.concatenate([self.fitness, tfitness[survive_indices]])
             self.skill_factor = np.concatenate([self.skill_factor, np.full(survive_size, task_id)])
         
-    def fit(self, num_gen, monitor=False, monitor_rate=10, llm_rate=1000):
+    def fit(self, num_eval=1, num_gen=1, monitor=False, monitor_rate=10, llm_rate=1000):
         #History Data
         bfs = np.zeros(shape=(self.num_tasks, num_gen + 1))
         mfs = np.zeros(shape=(self.num_tasks, num_gen + 1))
@@ -136,8 +133,6 @@ class AMFEA:
                 print("Gen {0}".format(gen))
                 if monitor:
                     for task_id in range(self.num_tasks):
-                        print("Task {0}:".format(task_id))
-                        print("Best Fitness: {0}".format(self.best_fitness[task_id]))
-                        print("Mean Fitness: {0}".format(self.mean_fitness[task_id]))
-                print("Time taken: %.2f seconds\n" % (end_time - start_time))
+                        print("Task {0}, Best: {1}, Avg: {2}".format(task_id, self.best_fitness[task_id], self.mean_fitness[task_id]))
+                print("Time taken each gen: %.4f seconds\n" % (end_time - start_time))
         return bfs, mfs

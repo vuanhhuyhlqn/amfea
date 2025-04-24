@@ -79,7 +79,6 @@ class AdaptiveRMP(AbstractRMP):
                     off_idea = deepseek.mutation(off_idea, off_idea.performance)
                     mutation_individual = IndividualRMP(off_idea)
                     individual_performance = mutation_individual.evaluate(p1, p2, p1_skill_factor, p2_skill_factor, p1_fitness, p2_fitness, tasks)
-
                 off_individual = IndividualRMP(off_idea)
                 off_individual.performance = individual_performance
                 off_list.append(off_individual)

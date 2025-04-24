@@ -13,7 +13,7 @@ def remove_first_last_lines(text):
     lines = text.strip().split('\n')
     result = lines[1:-1]
     return '\n'.join(result)
-class DeepsekModel2:
+class DeepseekModel2:
     def __init__(self, API_KEY):
         self.API_KEY = API_KEY
 
