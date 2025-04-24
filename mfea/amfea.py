@@ -22,7 +22,7 @@ class AMFEA:
         self.crossover = crossover
         self.mutation = mutation
         self.rmp = rmp
-        self.pop = np.random.uniform(size=(self.pop_size, self.indi_len))
+        self.pop = np.random.rand(self.pop_size, self.indi_len)
         self.skill_factor = np.zeros(self.pop_size, dtype=int)
         self.terminate = False
 
@@ -68,7 +68,8 @@ class AMFEA:
         return p, p_skill_factor, p_fitness
 
     def evolve(self, gen, llm_rate):
-        num_pair = np.random.randint(int(self.pop_size * 9 / 10), int(self.pop_size))
+        # num_pair = np.random.randint(int(self.pop_size * 9 / 10), int(self.pop_size))
+        num_pair = self.pop_size #full
         p1, p2, p1_skill_factor, p2_skill_factor, p1_fitness, p2_fitness = self.get_random_parents(num_pair)
         #Adaptive RMP
 

@@ -9,15 +9,14 @@ class SBXCrossover(AbstractCrossover):
 		
 	def crossover(self, rmp, p1, p2, p1_skill_factor, p2_skill_factor, eval=False, tasks=None):
 		assert(len(rmp) == len(p1) and len(rmp) == len(p2))
-		rnd = np.random.uniform(size = rmp.shape)
+		rnd = np.random.rand(len(rmp))
 		rnd[p1_skill_factor == p2_skill_factor] = 0.0
 		crossover_mask = rnd < rmp
-		crossover_indices = np.where(rnd < rmp)[0]
 
 		_p1 = p1[crossover_mask]
 		_p2 = p2[crossover_mask]
 		
-		u = np.random.uniform(size=len(_p1))
+		u = np.random.rand(len(_p1))
 		beta = np.zeros(shape=len(_p1))
 
 		mask1 = u < 0.5
@@ -29,12 +28,11 @@ class SBXCrossover(AbstractCrossover):
 		new_beta_strides = (beta.strides[0], 0)
 
 		nbeta = np.lib.stride_tricks.as_strided(beta, new_beta_shape, new_beta_strides)
-
 		off1 = 0.5 * ((1 + nbeta) * _p1 + (1 - nbeta) * _p2)
-		off1_skill_factor = p1_skill_factor[crossover_indices]
+		off1_skill_factor = p1_skill_factor[crossover_mask]
 
 		off2 = 0.5 * ((1 - nbeta) * _p1 + (1 + nbeta) * _p2)
-		off2_skill_factor = p1_skill_factor[crossover_indices]
+		off2_skill_factor = p1_skill_factor[crossover_mask]
 
 		off = np.concatenate([off1, off2])
 		off = np.clip(off, a_min=0, a_max=1)
@@ -58,8 +56,6 @@ class SBXCrossover(AbstractCrossover):
 				task_mask = off_skill_factor == task_id
 				off_fitness[task_mask] = tasks[task_id].fitness(off[task_mask]) 
 				p_fitness = tasks[task_id].fitness(_p1[task_mask])
-				# print(off_fitness[task_mask])
-				# print(p_fitness)
 				better_off_cnt += np.sum(off_fitness[task_mask] > p_fitness)
 			return off, off_skill_factor, better_off_cnt
 
