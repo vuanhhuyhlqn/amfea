@@ -61,8 +61,6 @@ class AdaptiveRMP(AbstractRMP):
         if gen_mfea % llm_rate == 0:
             if gen_mfea == 0:
                 self.rmp_pop.gen_pop(p1, p2, p1_skill_factor, p2_skill_factor, p1_fitness, p2_fitness, tasks)
-<<<<<<< HEAD
-
             off_list = []
             par1, par2 = np.random.choice(self.rmp_pop.individuals, 2)
             if np.random.rand() < self.pc:
@@ -81,28 +79,6 @@ class AdaptiveRMP(AbstractRMP):
                     off_idea = deepseek.mutation(off_idea, off_individual.performance)
                     mutation_individual = IndividualRMP(off_idea)
                     individual_performance = mutation_individual.evaluate(p1, p2, p1_skill_factor, p2_skill_factor, p1_fitness, p2_fitness, tasks)
-
-=======
-            off_list = []
-            par1, par2 = np.random.choice(self.rmp_pop.individuals, 2)
-            if np.random.rand() < self.pc:
-                off_idea = deepseek.crossover(par1.idea, par2.idea, par1.performance, par2.performance)
-                crossover_individual = IndividualRMP(off_idea)
-                individual_performance = crossover_individual.evaluate(p1, p2, p1_skill_factor, p2_skill_factor, p1_fitness, p2_fitness, tasks)
-                if crossover_individual.performance >= par1.performance or crossover_individual.performance >= par2.performance:
-                    off_list.append(crossover_individual)
-                else:
-                    off_idea = deepseek.reverse(off_idea)
-                    reversed_individual = IndividualRMP(off_idea)
-                    individual_performance = reversed_individual.evaluate(p1, p2, p1_skill_factor, p2_skill_factor, p1_fitness, p2_fitness, tasks)
-                    off_list.append(reversed_individual)
-
-                if np.random.rand() < self.pm:
-                    off_idea = deepseek.mutation(off_idea, off_individual.performance)
-                    mutation_individual = IndividualRMP(off_idea)
-                    individual_performance = mutation_individual.evaluate(p1, p2, p1_skill_factor, p2_skill_factor, p1_fitness, p2_fitness, tasks)
-
->>>>>>> fea1c0b14f80928ecc3498ff24c7d2c3c996a5d7
                 off_individual = IndividualRMP(off_idea)
                 off_individual.performance = individual_performance
                 off_list.append(off_individual)

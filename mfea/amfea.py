@@ -10,7 +10,6 @@ class AMFEA:
     def __init__(self,
                  num_indis_per_task,
                  indi_len,
-                 bound,
                  tasks : List[AbstractTask],
                  crossover: AbstractCrossover,
                  mutation: AbstractMutation,
@@ -18,14 +17,12 @@ class AMFEA:
                  ):
         self.indi_len = indi_len
         self.tasks = tasks
-        self.bound = bound
         self.num_tasks = len(tasks)
         self.pop_size = num_indis_per_task * self.num_tasks
         self.crossover = crossover
         self.mutation = mutation
         self.rmp = rmp
-
-        self.pop = np.random.uniform(-self.bound, self.bound, size=(self.pop_size, self.indi_len))
+        self.pop = np.random.uniform(size=(self.pop_size, self.indi_len))
         self.skill_factor = np.zeros(self.pop_size, dtype=int)
 
         for i in range(self.pop_size):
