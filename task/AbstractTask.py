@@ -3,7 +3,7 @@ from numba import jit
 
 class AbstractTask:
     def __init__(self):
-        pass
+        self.evaluation_cnt = 0
     def bound_decode(self, p, bound, dim):
         # print(p)
         p_decoded = p[:, :dim] * (2 * bound) + (-bound)

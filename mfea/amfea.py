@@ -24,6 +24,11 @@ class AMFEA:
         self.rmp = rmp
         self.pop = np.random.uniform(size=(self.pop_size, self.indi_len))
         self.skill_factor = np.zeros(self.pop_size, dtype=int)
+        self.terminate = False
+
+        #stopping criteria
+        self.eval_cnt = 0
+        self.max_eval = 0
 
         for i in range(self.pop_size):
             self.skill_factor[i] = i % self.num_tasks
@@ -63,7 +68,7 @@ class AMFEA:
         return p, p_skill_factor, p_fitness
 
     def evolve(self, gen, llm_rate):
-        num_pair = np.random.randint(0, int(self.pop_size / 3))
+        num_pair = np.random.randint(int(self.pop_size / 2), int(self.pop_size * 2 / 3))
         p1, p2, p1_skill_factor, p2_skill_factor, p1_fitness, p2_fitness = self.get_random_parents(num_pair)
         #Adaptive RMP
 
@@ -78,6 +83,12 @@ class AMFEA:
             task_mask = off_skill_factor == task_id 
             off_fitness[task_mask] = self.tasks[task_id].fitness(off[task_mask])
 
+            if self.eval_cnt + len(off[task_mask]) > self.max_eval:
+                self.terminate = True
+                return
+
+            self.eval_cnt += len(off[task_mask])
+
         #Mutation
         num_mutation = np.random.randint(0, int(self.pop_size) / 3)
         off_mut, off_mut_skill_factor, off_mut_fitness = self.get_random_individuals(num_mutation)
@@ -87,6 +98,12 @@ class AMFEA:
         for task_id in range(self.num_tasks):
             task_mask = off_mut_skill_factor == task_id 
             off_mut_fitness[task_mask] = self.tasks[task_id].fitness(off_mut[task_mask])
+
+            if self.eval_cnt + len(off_mut[task_mask]) > self.max_eval:
+                self.terminate = True
+                return
+
+            self.eval_cnt += len(off_mut[task_mask])
         
         ipop = np.concatenate([self.pop, off, off_mut])
         iskill_factor = np.concatenate([self.skill_factor, off_skill_factor, off_mut_skill_factor])
@@ -116,8 +133,9 @@ class AMFEA:
             self.fitness = np.concatenate([self.fitness, tfitness[survive_indices]])
             self.skill_factor = np.concatenate([self.skill_factor, np.full(survive_size, task_id)])
         
-    def fit(self, num_eval=1, num_gen=1, monitor=False, monitor_rate=10, llm_rate=1000):
+    def fit(self, max_eval=1e9, num_gen=1, monitor=False, monitor_rate=10, llm_rate=1000):
         #History Data
+        self.max_eval = max_eval
         bfs = np.zeros(shape=(self.num_tasks, num_gen + 1))
         mfs = np.zeros(shape=(self.num_tasks, num_gen + 1))
 
@@ -125,6 +143,14 @@ class AMFEA:
             start_time = time.time()
             self.evolve(gen, llm_rate)
             end_time = time.time()
+
+            if self.terminate:
+                print("Out of evaluation!")
+                for task_id in range(self.num_tasks):
+                        print("Task {0}, Best: {1}, Avg: {2}".format(task_id, self.best_fitness[task_id], self.mean_fitness[task_id]))
+
+                return bfs, mfs
+
             for task_id in range(self.num_tasks):
                 bfs[task_id][gen] = self.best_fitness[task_id]
                 mfs[task_id][gen] = self.mean_fitness[task_id]
@@ -132,6 +158,7 @@ class AMFEA:
             if gen % monitor_rate == 0:
                 print("Gen {0}".format(gen))
                 if monitor:
+                    print("Evaluation count: {0}".format(self.eval_cnt))
                     for task_id in range(self.num_tasks):
                         print("Task {0}, Best: {1}, Avg: {2}".format(task_id, self.best_fitness[task_id], self.mean_fitness[task_id]))
                 print("Time taken each gen: %.4f seconds\n" % (end_time - start_time))
