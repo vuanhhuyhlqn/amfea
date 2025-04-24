@@ -68,7 +68,7 @@ class AMFEA:
         return p, p_skill_factor, p_fitness
 
     def evolve(self, gen, llm_rate):
-        num_pair = np.random.randint(int(self.pop_size / 2), int(self.pop_size * 2 / 3))
+        num_pair = np.random.randint(int(self.pop_size * 9 / 10), int(self.pop_size))
         p1, p2, p1_skill_factor, p2_skill_factor, p1_fitness, p2_fitness = self.get_random_parents(num_pair)
         #Adaptive RMP
 
@@ -90,24 +90,28 @@ class AMFEA:
             self.eval_cnt += len(off[task_mask])
 
         #Mutation
-        num_mutation = np.random.randint(0, int(self.pop_size) / 3)
-        off_mut, off_mut_skill_factor, off_mut_fitness = self.get_random_individuals(num_mutation)
-        off_mut, off_mut_skill_factor = self.mutation(off_mut, off_mut_skill_factor)
+        # num_mutation = np.random.randint(0, int(self.pop_size) * 15 / 100)
+        # off_mut, off_mut_skill_factor, off_mut_fitness = self.get_random_individuals(num_mutation)
+        # off_mut, off_mut_skill_factor = self.mutation(off_mut, off_mut_skill_factor)
         
         #Calculate mutation offsprings fitness
-        for task_id in range(self.num_tasks):
-            task_mask = off_mut_skill_factor == task_id 
-            off_mut_fitness[task_mask] = self.tasks[task_id].fitness(off_mut[task_mask])
+        # for task_id in range(self.num_tasks):
+        #     task_mask = off_mut_skill_factor == task_id 
+        #     off_mut_fitness[task_mask] = self.tasks[task_id].fitness(off_mut[task_mask])
 
-            if self.eval_cnt + len(off_mut[task_mask]) > self.max_eval:
-                self.terminate = True
-                return
+        #     if self.eval_cnt + len(off_mut[task_mask]) > self.max_eval:
+        #         self.terminate = True
+        #         return
 
-            self.eval_cnt += len(off_mut[task_mask])
+        #     self.eval_cnt += len(off_mut[task_mask])
         
-        ipop = np.concatenate([self.pop, off, off_mut])
-        iskill_factor = np.concatenate([self.skill_factor, off_skill_factor, off_mut_skill_factor])
-        ifitness = np.concatenate([self.fitness, off_fitness, off_mut_fitness])
+        # ipop = np.concatenate([self.pop, off, off_mut])
+        # iskill_factor = np.concatenate([self.skill_factor, off_skill_factor, off_mut_skill_factor])
+        # ifitness = np.concatenate([self.fitness, off_fitness, off_mut_fitness])
+
+        ipop = np.concatenate([self.pop, off])
+        iskill_factor = np.concatenate([self.skill_factor, off_skill_factor])
+        ifitness = np.concatenate([self.fitness, off_fitness])
 
         # print(ipop)
         # print(ifitness)
