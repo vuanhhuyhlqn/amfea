@@ -7,8 +7,10 @@ class CEC17Task(AbstractTask):
         self.func = func
         self.bound = bound
 
-    def __call__(self, p):
-        return np.array(self.func(x) for x in self.bound_decode(p, self.bound, dim=50))    
+    def fitness(self, p):
+        # for x in self.bound_decode(p, self.bound, dim=50):
+        #     print(self.func(x))
+        return np.array([self.func(x) for x in self.bound_decode(p, self.bound, dim=50)])    
 
 def get_10_tasks():
     pass

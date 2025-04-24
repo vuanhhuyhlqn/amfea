@@ -2,7 +2,7 @@ import numpy as np
 from .AbstractFunc import AbstractFunc
 
 class Sphere(AbstractFunc):
-    def __init__(self, dim, shift, rotation_matrix):
+    def __init__(self, dim, shift=None, rotation_matrix=None):
         super().__init__(dim, shift, rotation_matrix)
 
     def __call__(self, x):
@@ -10,7 +10,7 @@ class Sphere(AbstractFunc):
         return np.sum(_x**2, axis=0)
 
 class Weierstrass(AbstractFunc):
-    def __init__(self, dim, shift, rotation_matrix):
+    def __init__(self, dim, shift=None, rotation_matrix=None):
         super().__init__(dim, shift, rotation_matrix)
         self.params = {}
         self.params['a'] = 0.5
@@ -26,7 +26,7 @@ class Weierstrass(AbstractFunc):
         return left - right
     
 class Ackley(AbstractFunc):
-    def __init__(self, dim, shift, rotation_matrix):
+    def __init__(self, dim, shift=None, rotation_matrix=None):
         super().__init__(dim, shift, rotation_matrix)
         self.params = {}
         self.params['a'] = 20
@@ -40,7 +40,7 @@ class Ackley(AbstractFunc):
                 + np.exp(1)
     
 class Rosenbrock(AbstractFunc):
-    def __init__(self, dim, shift, rotation_matrix):
+    def __init__(self, dim, shift=None, rotation_matrix=None):
         super().__init__(dim, shift, rotation_matrix)
     def __call__(self, x):
         _x = self.shift_rotation_decode(x)
@@ -49,21 +49,21 @@ class Rosenbrock(AbstractFunc):
         return l + r
 
 class Schwefel(AbstractFunc):
-    def __init__(self, dim, shift, rotation_matrix):
+    def __init__(self, dim, shift=None, rotation_matrix=None):
         super().__init__(dim, shift, rotation_matrix)
     def __call__(self, x):
         _x = self.shift_rotation_decode(x)
         return 418.9829 * self.dim - np.sum(_x * np.sin(np.sqrt(np.abs(_x))))
 
 class Griewank(AbstractFunc):
-    def __init__(self, dim, shift, rotation_matrix):
+    def __init__(self, dim, shift=None, rotation_matrix=None):
         super().__init__(dim, shift, rotation_matrix)
     def __call__(self, x):
         _x = self.shift_rotation_decode(x)
         return np.sum(_x**2) / 4000 - np.prod(np.cos(_x / np.sqrt((np.arange(self.dim) + 1)))) + 1
 
 class Rastrigin(AbstractFunc):
-    def __init__(self, dim, shift, rotation_matrix):
+    def __init__(self, dim, shift=None, rotation_matrix=None):
         super().__init__(dim, shift, rotation_matrix)
     def __call__(self, x):
         _x = self.shift_rotation_decode(x)
