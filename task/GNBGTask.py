@@ -7,4 +7,4 @@ class GNBGTask(AbstractTask):
         self.gnbg = GNBG_instances.get_gnbg(id)
         self.bound = bound
     def fitness(self, p):
-        return self.gnbg.fitness(self.decode(p, self.bound))
+        return self.gnbg.fitness(self.bound_decode(p, self.bound, 50))
