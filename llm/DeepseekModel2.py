@@ -51,8 +51,8 @@ class DeepseekModel2:
         ideas2_text = ""
         for idea in ideas1:
             ideas1_text += idea + "\n"
-        for idea in ideas1:
-            ideas1_text += idea + "\n"
+        for idea in ideas2:
+            ideas2_text += idea + "\n"
         prompt = reflect_text.format(ideas1_text, ideas2_text, per1, per2)
         client = OpenAI(api_key=self.API_KEY, base_url="https://api.deepseek.com")
         response = client.chat.completions.create(
