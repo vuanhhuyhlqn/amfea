@@ -5,6 +5,7 @@ class PolynomialMutation(AbstractMutation):
 	def __init__(self, eta_m, p_m):
 		self.eta_m = eta_m
 		self.p_m = p_m
+
 	def polynomial_mutation(self, p, p_skill_factor):
 		mutated_p = p.copy()
 		
