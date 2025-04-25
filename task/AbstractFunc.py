@@ -14,6 +14,9 @@ class AbstractFunc:
         else:
             self.shift = np.zeros(dim)
     def shift_rotation_decode(self, x):
+        print(x.shape)
+        print(self.shift.shape)
+        print(self.rotation_matrix.shape)
         return self.rotation_matrix @ (x - self.shift)
     def __call__(self, x):
         pass
