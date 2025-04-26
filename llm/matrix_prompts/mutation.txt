@@ -1,0 +1,4 @@
+I am using MFEA algorithm to optimize some different tasks. From the idea below and its performance where performance is evaluated based on the number of new offspring that have better fitness than the parent, please help me generate an improved idea to create a function that generates a RMP(Random Mating Probability) array from a set of parents. This function takes six inputs: 'p1', 'p2', 'p1_skill_factor', 'p2_skill_factor','p1_fitness','p2_fitness' where 'p1','p2' are the parents; 'p1_fitness','p2_fitness' are the current parents' fitness score; 'p1_skill_factor','p2_skill_factor' are the skill factor of current parents. All are numpy arrays. The idea contains only text instructions, without any mathematical formulas. The idea should not be too simple.
+Idea: {0}
+Idea's performance: {1}
+No other information is given. The idea consists of only 1 short sentence. The output should only contain the output idea, without any symbols or numbering.
