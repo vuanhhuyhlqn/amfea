@@ -1,3 +1,8 @@
-I am using MFEA algorithm to optimize some different tasks. From the idea below, please help me generate an reversed idea to create a function that generates a RMP(Random Mating Probability) array from a set of parents. This function takes six inputs: 'p1', 'p2', 'p1_skill_factor', 'p2_skill_factor','p1_fitness','p2_fitness' where 'p1','p2' are the parents; 'p1_fitness','p2_fitness' are the current parents' fitness score; 'p1_skill_factor','p2_skill_factor' are the skill factor of current parents. All are numpy arrays. The idea contains only text instructions, without any mathematical formulas. The idea should not be too simple.
-Idea: {0}
-No other information is given. The output should only contain the output idea, without any symbols or numbering.
+I am using MFEA algorithm to optimize some different tasks. From the strategy below, help me generate an reversed strategy to create a RMP (Random Mating Probability) matrix with some information are task_count, task_performance, diversity, convergence and task_similarity where:
+- 'task_count': Number of tasks
+- 'task_performance': List of convergence percentages for each task (0 to 100)
+- 'diversity': List of genetic diversity values for each task
+- 'convergence': List of convergence rates for each task
+- 'task_similarity': List of Wtuples (i, j, similarity) indicating similarity between tasks T_i and T_j (0 to 1)
+Strategy: {0}
+The strategy should not be too simple. The output strategy must consist of only 1 sentence and no more than 50 words, without any symbols or numbering.

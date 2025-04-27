@@ -51,6 +51,9 @@ class AMFEA:
         self.max_fitness_distances = self.mean_fitness - self.optimums
         self.max_fitness_distances = np.where(self.max_fitness_distances == 0, 1e-10, self.max_fitness_distances) 
 
+        self.armp_matrix = np.full((self.num_tasks, self.num_tasks), 0.3)
+        np.fill_diagonal(self.armp_matrix, 1.0)
+
         print("Initialization:")
         for task_id in range(self.num_tasks):
             print("Task {0}:".format(task_id))
@@ -63,10 +66,13 @@ class AMFEA:
         
         p1_skill_factor = self.skill_factor[p1_indices]
         p2_skill_factor = self.skill_factor[p2_indices]
+
+        p1_skill_factor = np.asarray(p1_skill_factor, dtype=int)
+        p2_skill_factor = np.asarray(p2_skill_factor, dtype=int)
         
-        p1_fitness = self.fitness[p1_indices]
-        p2_fitness = self.fitness[p2_indices]
-        return self.pop[p1_indices], self.pop[p2_indices], p1_skill_factor, p2_skill_factor, p1_fitness, p2_fitness
+        # p1_fitness = self.fitness[p1_indices]
+        # p2_fitness = self.fitness[p2_indices]
+        return self.pop[p1_indices], self.pop[p2_indices], p1_skill_factor, p2_skill_factor
 
     def get_random_individuals(self, num):
         p_indices = np.random.randint(0, self.pop_size, num)
@@ -87,7 +93,7 @@ class AMFEA:
         task_performance = (self.max_fitness_distances - (self.mean_fitness - self.optimums)) / self.max_fitness_distances * 100
         task_performance = np.clip(task_performance, 0, 100)
         state["task_performance"] = task_performance.tolist()        
-        print("Task Performance:" + str(state["task_performance"])) 
+        # print("Task Performance:" + str(state["task_performance"])) 
         
         for task_id in range(self.num_tasks):
             task_mask = self.skill_factor == task_id
@@ -113,8 +119,8 @@ class AMFEA:
                 convergence = 0.0
             state["convergence"].append(convergence)
 
-        print("Diversity:" + str(state["diversity"]))
-        print("Convergence:" + str(state["convergence"]))
+        # print("Diversity:" + str(state["diversity"]))
+        # print("Convergence:" + str(state["convergence"]))
 
         for i in range(self.num_tasks):
             for j in range(i+1, self.num_tasks):
@@ -146,25 +152,26 @@ class AMFEA:
                 similarity = 0.5 * fitness_corr + 0.5 * solution_similarity
                 state["task_similarity"].append((i, j, similarity))
 
-        print("Task Similarity:" + str(state["task_similarity"]))
+        # print("Task Similarity:" + str(state["task_similarity"]))
 
         return state
 
-    def evolve(self, gen, llm_rate):
+    def evolve(self, gen, llm_rate, lookback):
         # num_pair = np.random.randint(int(self.pop_size * 9 / 10), int(self.pop_size))
-        num_pair = self.pop_size #full
-        p1, p2, p1_skill_factor, p2_skill_factor, p1_fitness, p2_fitness = self.get_random_parents(num_pair)
+        num_pair_test = 10
+        p1, p2, p1_skill_factor, p2_skill_factor = self.get_random_parents(num_pair_test)
+        
         #Adaptive RMP
+        if gen != 0:
+            if gen % llm_rate == 0 or gen == lookback + 1:
+                collect_state = self.collect_population_state(gen, lookback)
+                self.armp_matrix = self.rmp(collect_state, p1, p2, p1_skill_factor, p2_skill_factor, gen, lookback, self.tasks)
         
-        if gen % llm_rate == 0 and gen != 0:
-            collect_state = self.collect_population_state(gen, lookback=10)
-            armp = self.rmp(p1, p2, p1_skill_factor, p2_skill_factor, p1_fitness, p2_fitness, gen, llm_rate, self.tasks)
-        else:
-            normalRMP = NormalRMP()
-            armp = normalRMP(p1, p2, p1_skill_factor, p2_skill_factor, p1_fitness, p2_fitness, gen, llm_rate, self.tasks)
-        
-        #Crossover 
-        off, off_skill_factor = self.crossover(armp, p1, p2, p1_skill_factor, p2_skill_factor)
+        #Crossover
+        num_pair = self.pop_size #full
+        p1, p2, p1_skill_factor, p2_skill_factor = self.get_random_parents(num_pair)
+
+        off, off_skill_factor = self.crossover(self.armp_matrix, p1, p2, p1_skill_factor, p2_skill_factor)
         off_fitness = np.zeros(len(off), dtype=np.float32)
 
         #Calculate crossover offsprings fitness
@@ -211,7 +218,7 @@ class AMFEA:
 
         for gen in range(num_gen + 1):
             start_time = time.time()
-            self.evolve(gen, llm_rate)
+            self.evolve(gen, llm_rate, lookback=10)
             end_time = time.time()
 
             if self.terminate:

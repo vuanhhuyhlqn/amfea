@@ -1,4 +1,12 @@
-I'm using MFEA algorithm to optimize a number of different tasks. Help me generate exactly 1 function to create a RMP(Random Mating Probability) array from a set of parents using the idea below. The code is a Python function called 'get_rmp' that takes six inputs: 'p1', 'p2', 'p1_skill_factor', 'p2_skill_factor','p1_fitness','p2_fitness' where 'p1','p2' are the parents; 'p1_fitness','p2_fitness' are the current parents' fitness score; 'p1_skill_factor','p2_skill_factor' are the skill factor of current parents. All are numpy arrays. Output is an Numpy array containing values ​​in the range (0,1). Don't use for loop because it's slow, try to optimize using Numpy.
-Idea: {0}
-Do not modify any of the paremeter passed into the function.
-Just provide the code without comment and no explanation. The Python code begins with a < and ends with a >.
+I'm using MFEA algorithm to optimize a number of different tasks. Help me generate a Python function named 'get_rmp_matrix' for crossover process that takes exactly 5 inputs: task_count, task_performance, diversity, convergence, and task_similarity, where:
+- 'task_count': An integer specifying the number of tasks.
+- 'task_performance': A list of floats (0 to 100) representing convergence percentages for each task.
+- 'diversity': A list of floats representing genetic diversity values for each task.
+- 'convergence': A list of floats representing convergence rates for each task.
+- 'task_similarity': A list of tuples (i, j, similarity) where i and j are integers (task indices) and similarity is a float (0 to 1) indicating similarity between tasks T_i and T_j.
+The function must return a task_count x task_count Numpy matrix where:
+- RMP[i][i] = 1.0 for all i.
+- RMP[i][j] = RMP[j][i] for all i, j (symmetric matrix).
+- RMP[i][j] is in [0, 1] for all i, j.
+The function must implement the following strategy: {0}
+Output only valid Python code for the function, without any comments, explanations, or extra text. Do not modify the input parameters. Try to optimize using Numpy.

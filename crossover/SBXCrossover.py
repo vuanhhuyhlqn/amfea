@@ -6,8 +6,12 @@ class SBXCrossover(AbstractCrossover):
 	def __init__(self, mutation: AbstractMutation, eta=2):
 		self.mutation = mutation
 		self.eta = eta
+
+	def rmp_matrix_to_array(self, rmp_matrix, p1_skill_factor, p2_skill_factor):
+		return rmp_matrix[p1_skill_factor, p2_skill_factor]
 		
-	def crossover(self, rmp, p1, p2, p1_skill_factor, p2_skill_factor, eval=False, tasks=None):
+	def crossover(self, rmp_matrix, p1, p2, p1_skill_factor, p2_skill_factor, eval=False, tasks=None):
+		rmp = self.rmp_matrix_to_array(rmp_matrix, p1_skill_factor, p2_skill_factor)
 		assert(len(rmp) == len(p1) and len(rmp) == len(p2))
 		rnd = np.random.rand(len(rmp))
 		rnd[p1_skill_factor == p2_skill_factor] = 0.0
@@ -58,7 +62,7 @@ class SBXCrossover(AbstractCrossover):
 				p_fitness = tasks[task_id].fitness(_p1[task_mask])
 				better_off_cnt += np.sum(off_fitness[task_mask] > p_fitness)
 			return off, off_skill_factor, better_off_cnt
-
+	
 		assert(len(off) == len(off_skill_factor))
 		return off, off_skill_factor
 
