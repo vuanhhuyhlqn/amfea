@@ -1,6 +1,5 @@
-I am using MFEA algorithm to optimize some different tasks. From the strategy below and its performance where performance is the percentage of offsprings that have better fitness than their parents, please help me generate an mutation strategy to create a RMP (Random Mating Probability) matrix with some information are task_count, task_performance, diversity, convergence and task_similarity where:
+I am using MFEA algorithm to optimize some different tasks. From the strategy below and its performance where performance is the percentage of offsprings that have better fitness than their parents, please help me generate an mutation strategy to create a RMP (Random Mating Probability) matrix with some information are task_count, diversity, convergence and task_similarity where:
 - 'task_count': Number of tasks
-- 'task_performance': List of convergence percentages for each task (0 to 100)
 - 'diversity': List of genetic diversity values for each task
 - 'convergence': List of convergence rates for each task
 - 'task_similarity': List of Wtuples (i, j, similarity) indicating similarity between tasks T_i and T_j (0 to 1)

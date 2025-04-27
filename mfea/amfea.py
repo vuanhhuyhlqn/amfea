@@ -79,16 +79,10 @@ class AMFEA:
     def collect_population_state(self, gen, lookback):
         state = {
             "task_count": self.num_tasks,
-            "task_performance": [],
             "diversity": [],
             "convergence": [],
             "task_similarity": []
         }
-
-        # task_performance = (self.max_fitness_distances - (self.mean_fitness - self.optimums)) / self.max_fitness_distances * 100
-        # task_performance = np.clip(task_performance, 0, 100)
-        # state["task_performance"] = task_performance.tolist()        
-        # print("Task Performance:" + str(state["task_performance"])) 
         
         for task_id in range(self.num_tasks):
             task_mask = self.skill_factor == task_id
@@ -159,7 +153,7 @@ class AMFEA:
         if gen != 0:
             if gen % llm_rate == 0 or gen == lookback + 1:
                 collect_state = self.collect_population_state(gen, lookback)
-                self.armp_matrix = self.rmp(collect_state, p1, p2, p1_skill_factor, p2_skill_factor, gen, lookback, self.tasks)
+                self.armp_matrix = self.rmp(collect_state, p1, p2, p1_skill_factor, p2_skill_factor, p1_fitness, p2_fitness, gen, lookback, self.tasks)
         
         #Crossover
         num_pair = self.pop_size #full

@@ -1,6 +1,5 @@
-I'm using MFEA algorithm to optimize a number of different tasks. Help me generate a Python function named 'get_rmp_matrix' for crossover process that takes exactly 5 inputs: task_count, task_performance, diversity, convergence, and task_similarity, where:
-- 'task_count': An integer specifying the number of tasks.
-- 'task_performance': A list of floats (0 to 100) representing convergence percentages for each task.
+I'm using MFEA algorithm to optimize a number of different tasks. Help me generate a Python function named 'get_rmp_matrix' for crossover process that takes exactly 4 inputs: task_count, diversity, convergence, and task_similarity, where:
+- 'task_count': An integer specifying the number of tasks..
 - 'diversity': A list of floats representing genetic diversity values for each task.
 - 'convergence': A list of floats representing convergence rates for each task.
 - 'task_similarity': A list of tuples (i, j, similarity) where i and j are integers (task indices) and similarity is a float (0 to 1) indicating similarity between tasks T_i and T_j.
