@@ -4,9 +4,8 @@ Strategy 1's performance: {1}
 Strategy 2: {2}
 Strategy 2's performance: {3}
 The performance of a strategy is the percentage of offsprings that have better fitness than their parents.
-Analyze these strategies and the differences between their performances and give me a new strategy to create the mentioned matrix with some information are task_count, task_performance, diversity, convergence and task_similarity where:
+Analyze these strategies and the differences between their performances and give me a new strategy to create the mentioned matrix with some information are task_count, diversity, convergence and task_similarity where:
 - 'task_count': Number of tasks
-- 'task_performance': List of convergence percentages for each task (0 to 100)
 - 'diversity': List of genetic diversity values for each task
 - 'convergence': List of convergence rates for each task
 - 'task_similarity': List of Wtuples (i, j, similarity) indicating similarity between tasks T_i and T_j (0 to 1)
