@@ -5,6 +5,7 @@ from rmp import *
 from task import *
 from typing import List
 import time
+from scipy.stats import pearsonr
 
 class AMFEA:
     def __init__(self,
@@ -13,7 +14,8 @@ class AMFEA:
                  tasks : List[AbstractTask],
                  crossover: AbstractCrossover,
                  mutation: AbstractMutation,
-                 rmp: AbstractRMP
+                 rmp: AbstractRMP,
+                 optimums: List[float] = None
                  ):
         self.indi_len = indi_len
         self.tasks = tasks
@@ -25,6 +27,9 @@ class AMFEA:
         self.pop = np.random.rand(self.pop_size, self.indi_len)
         self.skill_factor = np.zeros(self.pop_size, dtype=int)
         self.terminate = False
+        self.optimums = optimums
+        self.mfs = None
+        self.bfs = None
 
         #stopping criteria
         self.eval_cnt = 0
@@ -39,9 +44,12 @@ class AMFEA:
 
         for task_id in range(self.num_tasks):
             task_mask = self.skill_factor == task_id
-            self.fitness[task_mask] = tasks[task_id].fitness(self.pop[task_mask])
+            self.fitness[task_mask] = self.tasks[task_id].fitness(self.pop[task_mask])
             self.best_fitness[task_id] = np.min(self.fitness[task_mask])
             self.mean_fitness[task_id] = np.mean(self.fitness[task_mask])
+
+        self.max_fitness_distances = self.mean_fitness - self.optimums
+        self.max_fitness_distances = np.where(self.max_fitness_distances == 0, 1e-10, self.max_fitness_distances) 
 
         print("Initialization:")
         for task_id in range(self.num_tasks):
@@ -67,15 +75,95 @@ class AMFEA:
         p_fitness = self.fitness[p_indices]
         return p, p_skill_factor, p_fitness
 
+    def collect_population_state(self, gen, lookback):
+        state = {
+            "task_count": self.num_tasks,
+            "task_performance": [],
+            "diversity": [],
+            "convergence": [],
+            "task_similarity": []
+        }
+
+        task_performance = (self.max_fitness_distances - (self.mean_fitness - self.optimums)) / self.max_fitness_distances * 100
+        task_performance = np.clip(task_performance, 0, 100)
+        state["task_performance"] = task_performance.tolist()        
+        print("Task Performance:" + str(state["task_performance"])) 
+        
+        for task_id in range(self.num_tasks):
+            task_mask = self.skill_factor == task_id
+            task_pop = self.pop[task_mask]
+
+            if len(task_pop) > 1:
+                distances = [np.linalg.norm(task_pop[i] - task_pop[j]) 
+                            for i in range(len(task_pop)) 
+                            for j in range(i+1, len(task_pop))]
+                diversity = np.mean(distances) if distances else 0.0
+            else:
+                diversity = 0.0
+            state["diversity"].append(diversity)
+
+            if len(self.bfs[task_id]) >= lookback + 1:
+                old_fitness = self.bfs[task_id][gen - lookback - 1]
+                new_fitness = self.bfs[task_id][gen - 1]
+                if old_fitness != 0 and old_fitness != float('inf'):
+                    convergence = (old_fitness - new_fitness) / abs(old_fitness)
+                else:
+                    convergence = 0.0
+            else:
+                convergence = 0.0
+            state["convergence"].append(convergence)
+
+        print("Diversity:" + str(state["diversity"]))
+        print("Convergence:" + str(state["convergence"]))
+
+        for i in range(self.num_tasks):
+            for j in range(i+1, self.num_tasks):
+                mask_i = self.skill_factor == i
+                mask_j = self.skill_factor == j
+                fitness_i = self.fitness[mask_i]
+                pop_i = self.pop[mask_i]
+                pop_j = self.pop[mask_j]
+                fitness_j = self.fitness[mask_j]
+
+                fitness_i_on_j = self.tasks[j].fitness(pop_i)
+                fitness_j_on_i = self.tasks[i].fitness(pop_j)
+
+                if len(fitness_i) == len(fitness_i_on_j) and len(fitness_j) == len(fitness_j_on_i):
+                    corr_i, _ = pearsonr(fitness_i, fitness_i_on_j) if len(fitness_i) > 1 else (0.0, 0.0)
+                    corr_j, _ = pearsonr(fitness_j, fitness_j_on_i) if len(fitness_j) > 1 else (0.0, 0.0)
+                    fitness_corr = max(corr_i, corr_j, 0.0)
+                else:
+                    fitness_corr = 0.0
+
+                best_idx_i = np.argmin(fitness_i) if len(fitness_i) > 0 else 0
+                best_idx_j = np.argmin(fitness_j) if len(fitness_j) > 0 else 0
+                best_ind_i = pop_i[best_idx_i] if len(pop_i) > 0 else np.zeros(self.indi_len)
+                best_ind_j = pop_j[best_idx_j] if len(pop_j) > 0 else np.zeros(self.indi_len)
+                solution_distance = np.linalg.norm(best_ind_i - best_ind_j)
+                max_distance = np.sqrt(self.indi_len)
+                solution_similarity = np.clip(1.0 - (solution_distance / max_distance), 0.0, 1.0)
+
+                similarity = 0.5 * fitness_corr + 0.5 * solution_similarity
+                state["task_similarity"].append((i, j, similarity))
+
+        print("Task Similarity:" + str(state["task_similarity"]))
+
+        return state
+
     def evolve(self, gen, llm_rate):
         # num_pair = np.random.randint(int(self.pop_size * 9 / 10), int(self.pop_size))
         num_pair = self.pop_size #full
         p1, p2, p1_skill_factor, p2_skill_factor, p1_fitness, p2_fitness = self.get_random_parents(num_pair)
         #Adaptive RMP
-
-        armp = self.rmp(p1, p2, p1_skill_factor, p2_skill_factor, p1_fitness, p2_fitness, gen, llm_rate, self.tasks)
         
-        #Crossover
+        if gen % llm_rate == 0 and gen != 0:
+            collect_state = self.collect_population_state(gen, lookback=10)
+            armp = self.rmp(p1, p2, p1_skill_factor, p2_skill_factor, p1_fitness, p2_fitness, gen, llm_rate, self.tasks)
+        else:
+            normalRMP = NormalRMP()
+            armp = normalRMP(p1, p2, p1_skill_factor, p2_skill_factor, p1_fitness, p2_fitness, gen, llm_rate, self.tasks)
+        
+        #Crossover 
         off, off_skill_factor = self.crossover(armp, p1, p2, p1_skill_factor, p2_skill_factor)
         off_fitness = np.zeros(len(off), dtype=np.float32)
 
@@ -118,8 +206,8 @@ class AMFEA:
     def fit(self, max_eval=1000000, num_gen=5000, monitor=False, monitor_rate=100, llm_rate=100):
         #History Data
         self.max_eval = max_eval
-        bfs = np.zeros(shape=(self.num_tasks, num_gen + 1))
-        mfs = np.zeros(shape=(self.num_tasks, num_gen + 1))
+        self.bfs = np.zeros(shape=(self.num_tasks, num_gen + 1))
+        self.mfs = np.zeros(shape=(self.num_tasks, num_gen + 1))
 
         for gen in range(num_gen + 1):
             start_time = time.time()
@@ -131,11 +219,11 @@ class AMFEA:
                 for task_id in range(self.num_tasks):
                         print("Task {0}, Best: {1}, Avg: {2}".format(task_id, self.best_fitness[task_id], self.mean_fitness[task_id]))
 
-                return bfs, mfs
+                return self.bfs, self.mfs
 
             for task_id in range(self.num_tasks):
-                bfs[task_id][gen] = self.best_fitness[task_id]
-                mfs[task_id][gen] = self.mean_fitness[task_id]
+                self.bfs[task_id][gen] = self.best_fitness[task_id]
+                self.mfs[task_id][gen] = self.mean_fitness[task_id]
 
             if gen % monitor_rate == 0:
                 print("Gen {0}".format(gen))
@@ -144,4 +232,5 @@ class AMFEA:
                     for task_id in range(self.num_tasks):
                         print("Task {0}, Best: {1}, Avg: {2}".format(task_id, self.best_fitness[task_id], self.mean_fitness[task_id]))
                 print("Time taken each gen: %.4f seconds\n" % (end_time - start_time))
-        return bfs, mfs
+
+        return self.bfs, self.mfs
