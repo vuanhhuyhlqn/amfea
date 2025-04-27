@@ -11,14 +11,14 @@ class Population:
         self.pop = []
         
         DEEPSEEK_API_KEY = os.getenv("DEEPSEEK_API_KEY")
-        self.model = DeepsekModel2(DEEPSEEK_API_KEY)
+        self.model = DeepseekModel2(DEEPSEEK_API_KEY)
 
         for _ in range(self.pop_size):
             self.pop.append(self.model.init_idea_from_llm())
         
         for p in self.pop:
             print(p)
-    
+
     def evaluate(self, p, p1, p2, p1_skill_factor, p2_skill_factor, p1_fitness, p2_fitness):
         rmp_function = self.model.gen_code_from_idea(p)
         f = {}
