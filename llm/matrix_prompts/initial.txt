@@ -1,2 +1,7 @@
-I am using MFEA algorithm to optimize some different tasks. Please help me generate {0} ideas to create a function that generates a RMP(Random Mating Probability) array from a set of parents. This function takes six inputs: 'p1', 'p2', 'p1_skill_factor', 'p2_skill_factor','p1_fitness','p2_fitness' where 'p1','p2' are the parents; 'p1_fitness','p2_fitness' are the current parents' fitness score; 'p1_skill_factor','p2_skill_factor' are the skill factor of current parents. All are numpy arrays. The idea contains only text instructions, without any mathematical formulas. The idea should not be too simple.
-Each idea consists of only 1 short sentence and be generated on a single row. The result is {0} ideas on {0} rows. No other information is given. The output should only contain the output ideas, without any symbols or numbering.
+I am using MFEA algorithm to optimize some different tasks. Help me generate {0} different strategies to create a RMP (Random Mating Probability) matrix with some information are task_count, task_performance, diversity, convergence and task_similarity where:
+- 'task_count': Number of tasks
+- 'task_performance': List of convergence percentages for each task (0 to 100)
+- 'diversity': List of genetic diversity values for each task
+- 'convergence': List of convergence rates for each task
+- 'task_similarity': List of tuples (i, j, similarity) indicating similarity between tasks T_i and T_j (0 to 1)
+Each strategy can be based on some of the above information to optimize the RMP matrix, should not be too simple. Output must be a valid JSON object with the following format: {{ "strategies": [ "strategy 1", "strategy 2", "strategy 3", ... ] }}. Do not number the strategies you create. Follow the format and do not give any further explain.

@@ -1,6 +1,13 @@
-I am using MFEA algorithm to optimize some different tasks. From 2 ideas below and their performances where performance is evaluated based on the number of new offspring that have better fitness than the parent, please help me generate a idea to create a function that generates a RMP(Random Mating Probability) array from a set of parents. This function takes six inputs: 'p1', 'p2', 'p1_skill_factor', 'p2_skill_factor','p1_fitness','p2_fitness' where 'p1','p2' are the parents; 'p1_fitness','p2_fitness' are the current parents' fitness score; 'p1_skill_factor','p2_skill_factor' are the skill factor of current parents. All are numpy arrays. The idea contains only text instructions, without any mathematical formulas. The idea should not be too simple.
-Idea 1: {0}
-Idea 1's performance: {1}
-Idea 2: {2}
-Idea 2's performance: {3}
-No other information is given. The idea consists of only 1 short sentence.The output should only contain the output idea, without any symbols or numbering.
+I am using MFEA algorithm to optimize some different tasks.Below is the two strategies to create a RMP (Random Mating Probability) matrix for crossover process and their performace.
+Strategy 1: {0}
+Strategy 1's performance: {1}
+Strategy 2: {2}
+Strategy 2's performance: {3}
+The performance of a strategy is the percentage of offsprings that have better fitness than their parents.
+Analyze these strategies and the differences between their performances and give me a new strategy to create the mentioned matrix with some information are task_count, task_performance, diversity, convergence and task_similarity where:
+- 'task_count': Number of tasks
+- 'task_performance': List of convergence percentages for each task (0 to 100)
+- 'diversity': List of genetic diversity values for each task
+- 'convergence': List of convergence rates for each task
+- 'task_similarity': List of Wtuples (i, j, similarity) indicating similarity between tasks T_i and T_j (0 to 1)
+The strategy should not be too simple. The output strategy must consist of only 1 sentence and no more than 50 words, without any symbols or numbering.
