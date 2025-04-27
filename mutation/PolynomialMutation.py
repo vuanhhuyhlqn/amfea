@@ -25,6 +25,7 @@ class PolynomialMutation(AbstractMutation):
 		mutated_p[mask2] += delta[mask2] * (1 - mutated_p[mask2]) 
 
 		mutated_p = np.clip(mutated_p, 0, 1)
+		assert(np.max(mutated_p) <= 1.0)
 		return mutated_p, p_skill_factor
 	def __call__(self, p, p_skill_factor):
 		return self.polynomial_mutation(p, p_skill_factor)

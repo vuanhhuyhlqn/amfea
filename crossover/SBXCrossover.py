@@ -1,5 +1,6 @@
 import numpy as np
 from .AbstractCrossover import AbstractCrossover
+from task import AbstractTask
 from mutation import AbstractMutation
 
 class SBXCrossover(AbstractCrossover):
@@ -7,16 +8,32 @@ class SBXCrossover(AbstractCrossover):
 		self.mutation = mutation
 		self.eta = eta
 
+	def evaluate(self, p, p_skill_factor, tasks):
+		p_fitness = np.zeros(len(p))
+		for task_id in range(len(tasks)):
+			task_mask = p_skill_factor == task_id
+			p_fitness[task_mask] = tasks[task_id].fitness(p[task_mask])
+		return p_fitness
+
 	def rmp_matrix_to_array(self, rmp_matrix, p1_skill_factor, p2_skill_factor):
 		return rmp_matrix[p1_skill_factor, p2_skill_factor]
 		
-	def crossover(self, rmp_matrix, p1, p2, p1_skill_factor, p2_skill_factor, eval=False, tasks=None):
+	def crossover(self, 
+			   rmp_matrix, 
+			   p1, 
+			   p2, 
+			   p1_skill_factor, 
+			   p2_skill_factor, 
+			   p1_fitness, 
+			   p2_fitness, 
+			   tasks, 
+			   eval=False):
 		rmp = self.rmp_matrix_to_array(rmp_matrix, p1_skill_factor, p2_skill_factor)
 		assert(len(rmp) == len(p1) and len(rmp) == len(p2))
 		rnd = np.random.rand(len(rmp))
 		rnd[p1_skill_factor == p2_skill_factor] = 0.0
 		crossover_mask = rnd < rmp
-
+		better_off_cnt = 0
 		_p1 = p1[crossover_mask]
 		_p2 = p2[crossover_mask]
 		
@@ -33,38 +50,70 @@ class SBXCrossover(AbstractCrossover):
 
 		nbeta = np.lib.stride_tricks.as_strided(beta, new_beta_shape, new_beta_strides)
 		off1 = 0.5 * ((1 + nbeta) * _p1 + (1 - nbeta) * _p2)
-		off1_skill_factor = p1_skill_factor[crossover_mask]
-
 		off2 = 0.5 * ((1 - nbeta) * _p1 + (1 + nbeta) * _p2)
+
+		off1 = np.clip(off1, a_min=0, a_max=1)
+		off2 = np.clip(off2, a_min=0, a_max=1)
+
+		assert(np.max(off1) <= 1.0)
+		assert(np.max(off2) <= 1.0)
+		off1_skill_factor = p1_skill_factor[crossover_mask]
 		off2_skill_factor = p1_skill_factor[crossover_mask]
+		off1_fitness = self.evaluate(off1, off1_skill_factor, tasks)
+		off2_fitness = self.evaluate(off2, off2_skill_factor, tasks)
+
+		if eval:
+			p_fitness = p1_fitness[crossover_mask]
+			assert(len(p_fitness) == len(off1_fitness))
+			assert(len(p_fitness) == len(off2_fitness))
+			better_off_cnt += np.sum(off1_fitness < p_fitness)
+			better_off_cnt += np.sum(off2_fitness < p_fitness)
 
 		off = np.concatenate([off1, off2])
-		off = np.clip(off, a_min=0, a_max=1)
 		off_skill_factor = np.concatenate([off1_skill_factor, off2_skill_factor])
+		off_fitness = np.concatenate([off1_fitness, off2_fitness])
 
 		mutation_mask = np.invert(crossover_mask)
 		_p1_mutation = p1[mutation_mask]
 		_p2_mutation = p2[mutation_mask]
 		off_mut_1, off_mut_skill_factor_1 = self.mutation(_p1_mutation, p1_skill_factor[mutation_mask])
 		off_mut_2, off_mut_skill_factor_2 = self.mutation(_p2_mutation, p2_skill_factor[mutation_mask])
+		
+		off_mut_fitness_1 = self.evaluate(off_mut_1, off_mut_skill_factor_1, tasks)
+		off_mut_fitness_2 = self.evaluate(off_mut_1, off_mut_skill_factor_2, tasks)
+
+		if eval:
+			p1_mut_fitness = p1_fitness[mutation_mask] #mutation parent 1
+			p2_mut_fitness = p2_fitness[mutation_mask] #mutation parent 2
+			better_off_cnt += np.sum(off_mut_fitness_1 < p1_mut_fitness)
+			better_off_cnt += np.sum(off_mut_fitness_2 < p2_mut_fitness)
 
 		off = np.concatenate([off, off_mut_1, off_mut_2])
 		off_skill_factor = np.concatenate([off_skill_factor, off_mut_skill_factor_1, off_mut_skill_factor_2])
+		off_fitness = np.concatenate([off_fitness, off_mut_fitness_1, off_mut_fitness_2])
+		assert(len(off) == len(off_skill_factor))
+		assert(len(off) == len(off_fitness))
 
 		if eval:
-			off_fitness = np.zeros(shape=len(off))
-			num_tasks = len(tasks)
-			better_off_cnt = 0
-	
-			for task_id in range(num_tasks):
-				task_mask = off_skill_factor == task_id
-				off_fitness[task_mask] = tasks[task_id].fitness(off[task_mask]) 
-				p_fitness = tasks[task_id].fitness(_p1[task_mask])
-				better_off_cnt += np.sum(off_fitness[task_mask] > p_fitness)
-			return off, off_skill_factor, better_off_cnt
-	
-		assert(len(off) == len(off_skill_factor))
-		return off, off_skill_factor
+			return off, off_skill_factor, off_fitness, better_off_cnt
 
-	def __call__(self, rmp, p1, p2, p1_skill_factor, p2_skill_factor, eval=False, tasks=None):
-		return self.crossover(rmp, p1, p2, p1_skill_factor, p2_skill_factor, eval, tasks)
+		return off, off_skill_factor, off_fitness
+
+	def __call__(self, rmp, 
+			  p1, 
+			  p2, 
+			  p1_skill_factor, 
+			  p2_skill_factor, 
+			  p1_fitness, 
+			  p2_fitness, 
+			  tasks, 
+			  eval=False):
+		return self.crossover(rmp, 
+						p1, 
+						p2, 
+						p1_skill_factor, 
+						p2_skill_factor, 
+						p1_fitness, 
+						p2_fitness, 
+						tasks, 
+						eval)

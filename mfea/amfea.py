@@ -15,7 +15,6 @@ class AMFEA:
                  crossover: AbstractCrossover,
                  mutation: AbstractMutation,
                  rmp: AbstractRMP,
-                 optimums: List[float] = None
                  ):
         self.indi_len = indi_len
         self.tasks = tasks
@@ -27,7 +26,6 @@ class AMFEA:
         self.pop = np.random.rand(self.pop_size, self.indi_len)
         self.skill_factor = np.zeros(self.pop_size, dtype=int)
         self.terminate = False
-        self.optimums = optimums
         self.mfs = None
         self.bfs = None
 
@@ -48,9 +46,6 @@ class AMFEA:
             self.best_fitness[task_id] = np.min(self.fitness[task_mask])
             self.mean_fitness[task_id] = np.mean(self.fitness[task_mask])
 
-        self.max_fitness_distances = self.mean_fitness - self.optimums
-        self.max_fitness_distances = np.where(self.max_fitness_distances == 0, 1e-10, self.max_fitness_distances) 
-
         self.armp_matrix = np.full((self.num_tasks, self.num_tasks), 0.3)
         np.fill_diagonal(self.armp_matrix, 1.0)
 
@@ -70,9 +65,9 @@ class AMFEA:
         p1_skill_factor = np.asarray(p1_skill_factor, dtype=int)
         p2_skill_factor = np.asarray(p2_skill_factor, dtype=int)
         
-        # p1_fitness = self.fitness[p1_indices]
-        # p2_fitness = self.fitness[p2_indices]
-        return self.pop[p1_indices], self.pop[p2_indices], p1_skill_factor, p2_skill_factor
+        p1_fitness = self.fitness[p1_indices]
+        p2_fitness = self.fitness[p2_indices]
+        return self.pop[p1_indices], self.pop[p2_indices], p1_skill_factor, p2_skill_factor, p1_fitness, p2_fitness
 
     def get_random_individuals(self, num):
         p_indices = np.random.randint(0, self.pop_size, num)
@@ -90,9 +85,9 @@ class AMFEA:
             "task_similarity": []
         }
 
-        task_performance = (self.max_fitness_distances - (self.mean_fitness - self.optimums)) / self.max_fitness_distances * 100
-        task_performance = np.clip(task_performance, 0, 100)
-        state["task_performance"] = task_performance.tolist()        
+        # task_performance = (self.max_fitness_distances - (self.mean_fitness - self.optimums)) / self.max_fitness_distances * 100
+        # task_performance = np.clip(task_performance, 0, 100)
+        # state["task_performance"] = task_performance.tolist()        
         # print("Task Performance:" + str(state["task_performance"])) 
         
         for task_id in range(self.num_tasks):
@@ -157,9 +152,8 @@ class AMFEA:
         return state
 
     def evolve(self, gen, llm_rate, lookback):
-        # num_pair = np.random.randint(int(self.pop_size * 9 / 10), int(self.pop_size))
         num_pair_test = 10
-        p1, p2, p1_skill_factor, p2_skill_factor = self.get_random_parents(num_pair_test)
+        p1, p2, p1_skill_factor, p2_skill_factor, p1_fitness, p2_fitness  = self.get_random_parents(num_pair_test)
         
         #Adaptive RMP
         if gen != 0:
@@ -169,21 +163,14 @@ class AMFEA:
         
         #Crossover
         num_pair = self.pop_size #full
-        p1, p2, p1_skill_factor, p2_skill_factor = self.get_random_parents(num_pair)
+        p1, p2, p1_skill_factor, p2_skill_factor, p1_fitness, p2_fitness = self.get_random_parents(num_pair)
 
-        off, off_skill_factor = self.crossover(self.armp_matrix, p1, p2, p1_skill_factor, p2_skill_factor)
-        off_fitness = np.zeros(len(off), dtype=np.float32)
-
-        #Calculate crossover offsprings fitness
-        for task_id in range(self.num_tasks):
-            task_mask = off_skill_factor == task_id 
-            off_fitness[task_mask] = self.tasks[task_id].fitness(off[task_mask])
-
-            if self.eval_cnt + len(off[task_mask]) > self.max_eval:
-                self.terminate = True
-                return
-
-            self.eval_cnt += len(off[task_mask])
+        off, off_skill_factor, off_fitness = self.crossover(self.armp_matrix, p1, p2, 
+                                               p1_skill_factor, 
+                                               p2_skill_factor, 
+                                               p1_fitness, 
+                                               p2_fitness,
+                                               self.tasks)
 
         ipop = np.concatenate([self.pop, off])
         iskill_factor = np.concatenate([self.skill_factor, off_skill_factor])
