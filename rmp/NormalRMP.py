@@ -7,5 +7,5 @@ class NormalRMP(AbstractRMP):
         pass
     def get_rmp(self, size):
         return np.full(shape=(size, size), fill_value=0.3)
-    def __call__(self, collect_state, p1, p2, p1_skill_factor, p2_skill_factor, gen, llm_rate, tasks):
+    def __call__(self, collect_state, p1, p2, p1_skill_factor, p2_skill_factor, p1_fitness, p2_fitness, gen, llm_rate, tasks):
         return self.get_rmp(len(tasks))
