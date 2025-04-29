@@ -33,7 +33,8 @@ class SBXCrossover(AbstractCrossover):
 		rnd = np.random.rand(len(rmp))
 		rnd[p1_skill_factor == p2_skill_factor] = 0.0
 		crossover_mask = rnd < rmp
-		better_off_cnt = 0
+		total_performance_diff = 0
+		avg_performance_diff = 0
 		_p1 = p1[crossover_mask]
 		_p2 = p2[crossover_mask]
 		
@@ -66,8 +67,14 @@ class SBXCrossover(AbstractCrossover):
 			p_fitness = p1_fitness[crossover_mask]
 			assert(len(p_fitness) == len(off1_fitness))
 			assert(len(p_fitness) == len(off2_fitness))
-			better_off_cnt += np.sum(off1_fitness < p_fitness)
-			better_off_cnt += np.sum(off2_fitness < p_fitness)
+
+			diff1 = p_fitness - off1_fitness
+			diff_percentage1 = (diff1 / p_fitness) * 100
+
+			diff2 = p_fitness - off2_fitness
+			diff_percentage2 = (diff2 / p_fitness) * 100
+
+			total_performance_diff += np.sum(diff_percentage1) + np.sum(diff_percentage2)
 
 		off = np.concatenate([off1, off2])
 		off_skill_factor = np.concatenate([off1_skill_factor, off2_skill_factor])
@@ -82,11 +89,17 @@ class SBXCrossover(AbstractCrossover):
 		off_mut_fitness_1 = self.evaluate(off_mut_1, off_mut_skill_factor_1, tasks)
 		off_mut_fitness_2 = self.evaluate(off_mut_1, off_mut_skill_factor_2, tasks)
 
-		# if eval:
-		# 	p1_mut_fitness = p1_fitness[mutation_mask] #mutation parent 1
-		# 	p2_mut_fitness = p2_fitness[mutation_mask] #mutation parent 2
-		# 	better_off_cnt += np.sum(off_mut_fitness_1 < p1_mut_fitness)
-		# 	better_off_cnt += np.sum(off_mut_fitness_2 < p2_mut_fitness)
+		if eval:
+			p1_fitness = p1_fitness[mutation_mask]
+			p2_fitness = p2_fitness[mutation_mask]
+
+			diff1 = p1_fitness - off_mut_fitness_1
+			diff2 = p2_fitness - off_mut_fitness_2
+
+			diff_percentage1 = (diff1 / p1_fitness) * 100
+			diff_percentage2 = (diff2 / p2_fitness) * 100
+
+			total_performance_diff += np.sum(diff_percentage1) + np.sum(diff_percentage2)
 
 		off = np.concatenate([off, off_mut_1, off_mut_2])
 		off_skill_factor = np.concatenate([off_skill_factor, off_mut_skill_factor_1, off_mut_skill_factor_2])
@@ -94,9 +107,9 @@ class SBXCrossover(AbstractCrossover):
 		assert(len(off) == len(off_skill_factor))
 		assert(len(off) == len(off_fitness))
 
+		avg_performance_diff = total_performance_diff / (len(off))
 		if eval:
-			return off, off_skill_factor, off_fitness, better_off_cnt
-
+			return off, off_skill_factor, off_fitness, avg_performance_diff
 		return off, off_skill_factor, off_fitness
 
 	def __call__(self, rmp, 
