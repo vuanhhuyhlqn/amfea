@@ -135,23 +135,21 @@ class AdaptiveRMPMatrix(AbstractRMP):
                 if np.random.rand() < self.pc:
                     off_strategy = llm.crossover(par1.strategy, par2.strategy)
                     crossover_individual = IndividualRMP(off_strategy)
-                    individual_performance = crossover_individual.evaluate(collect_state, p1, p2, p1_skill_factor, p2_skill_factor, p1_fitness, p2_fitness, tasks)
+                    crossover_individual.performance = crossover_individual.evaluate(collect_state, p1, p2, p1_skill_factor, p2_skill_factor, p1_fitness, p2_fitness, tasks)
                     if crossover_individual.performance >= par1.performance or crossover_individual.performance >= par2.performance:
                         off_list.append(crossover_individual)
                     else:
                         off_strategy = llm.reverse(off_strategy)
                         reversed_individual = IndividualRMP(off_strategy)
-                        individual_performance = reversed_individual.evaluate(collect_state, p1, p2, p1_skill_factor, p2_skill_factor, p1_fitness, p2_fitness, tasks)
+                        reversed_individual.performance = reversed_individual.evaluate(collect_state, p1, p2, p1_skill_factor, p2_skill_factor, p1_fitness, p2_fitness, tasks)
                         off_list.append(reversed_individual)
 
                     if np.random.rand() < self.pm:
                         off_strategy = llm.mutation(off_strategy)
                         mutation_individual = IndividualRMP(off_strategy)
-                        individual_performance = mutation_individual.evaluate(collect_state, p1, p2, p1_skill_factor, p2_skill_factor, p1_fitness, p2_fitness, tasks)
-                    off_individual = IndividualRMP(off_strategy)
-                    off_individual.performance = individual_performance
-                    off_list.append(off_individual)
-
+                        mutation_individual.performance = mutation_individual.evaluate(collect_state, p1, p2, p1_skill_factor, p2_skill_factor, p1_fitness, p2_fitness, tasks)
+                        off_list.append(mutation_individual)
+                        
                 self.rmp_pop.individuals.extend(off_list)
                 self.rmp_pop.individuals.sort(key=lambda x: x.performance, reverse=True)
                 self.rmp_pop.individuals = self.rmp_pop.individuals[:self.rmp_pop_size]
