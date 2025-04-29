@@ -38,7 +38,7 @@ class IndividualRMP:
 
     def evaluate(self, collect_state, p1, p2, p1_skill_factor, p2_skill_factor, p1_fitness, p2_fitness, tasks):
         print("Evaluating strategy")
-        print(f"Strategy:\n {"\n".join(self.strategy)}")
+        print(self.strategy)
         rmp_function = llm.strategy_to_code(self.strategy)
         print(f"RMP function: {rmp_function}")
         try:
