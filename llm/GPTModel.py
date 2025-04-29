@@ -106,11 +106,11 @@ class GPTModel(AbstractModel):
         return code
 
     # @rate_limited(4)
-    def crossover(self, p1_strategy, p2_strategy, p1_performance, p2_performance):
+    def crossover(self, p1_strategy, p2_strategy):
         print("Crossover...")
         p1_stra_text = "\n".join(p1_strategy)
         p2_stra_text = "\n".join(p2_strategy)
-        crossover_prompt = crossover_text.format(p1_stra_text.strip(), p1_performance ,p2_stra_text.strip(), p2_performance)
+        crossover_prompt = crossover_text.format(p1_stra_text, p2_stra_text)
         # print(crossover_prompt)
 
         response = self.client.chat.completions.create(
@@ -128,11 +128,11 @@ class GPTModel(AbstractModel):
         return crossover_strategy
     
     # @rate_limited(4)
-    def mutation(self, strategy, performance):
+    def mutation(self, strategy):
         print("Mutation...")
 
         stra_text = "\n".join(strategy)
-        mutation_prompt = mutation_text.format(stra_text.strip(), performance)
+        mutation_prompt = mutation_text.format(stra_text)
         # print(mutation_prompt)
 
         response = self.client.chat.completions.create(

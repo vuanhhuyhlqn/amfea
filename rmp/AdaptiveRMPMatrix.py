@@ -89,9 +89,8 @@ class IndividualRMP:
         print(self.rmp_matrix)
         mutation = PolynomialMutation(5, 0.02)
         crossover = SBXCrossover(mutation, eta=2)
-        _, _, _, better_off_cnt = crossover(self.rmp_matrix, p1, p2, p1_skill_factor, p2_skill_factor, p1_fitness, p2_fitness, eval=True, tasks=tasks)
-        print(f"Better off count: {better_off_cnt}")
-        self.performance = better_off_cnt / (len(p1) * 2) * 100
+        _, _, _, avg_performance_diff = crossover(self.rmp_matrix, p1, p2, p1_skill_factor, p2_skill_factor, p1_fitness, p2_fitness, eval=True, tasks=tasks)
+        self.performance = avg_performance_diff
         print(f"Performance: {self.performance}")
 
         return self.performance
@@ -104,7 +103,7 @@ class PopulationRMP:
         for _ in range(self.pop_size):
             strategy = llm.initial_strategy()
             individual = IndividualRMP(strategy)
-            individual.evaluate(collect_state, p1, p2, p1_skill_factor, p2_skill_factor, p1_fitness, p2_fitness, tasks)
+            # individual.evaluate(collect_state, p1, p2, p1_skill_factor, p2_skill_factor, p1_fitness, p2_fitness, tasks)
             self.individuals.append(individual)
 
 class AdaptiveRMPMatrix(AbstractRMP):
@@ -117,19 +116,22 @@ class AdaptiveRMPMatrix(AbstractRMP):
         self.rmp_function = None
 
     def get_rmp(self, collect_state, p1, p2, p1_skill_factor, p2_skill_factor, p1_fitness, p2_fitness, gen_mfea, llm_rate, tasks):
-        print("Pop mean:")
-        print(collect_state["pop_mean"])
-        print("Pop variance:")
-        print(collect_state["pop_variance"])
+        # print("Pop mean:")
+        # print(collect_state["pop_mean"])
+        # print("Pop variance:")
+        # print(collect_state["pop_variance"])
         if gen_mfea % llm_rate == 0:
             if gen_mfea == 0:
                 self.rmp_pop.gen_pop(collect_state, p1, p2, p1_skill_factor, p2_skill_factor, p1_fitness, p2_fitness, tasks)
             
+            for i in range(self.rmp_pop_size):
+                self.rmp_pop.individuals[i].evaluate(collect_state, p1, p2, p1_skill_factor, p2_skill_factor, p1_fitness, p2_fitness, tasks)
+
             for _ in range(self.num_gen):
                 off_list = []
                 par1, par2 = np.random.choice(self.rmp_pop.individuals, 2)
                 if np.random.rand() < self.pc:
-                    off_strategy = llm.crossover(par1.strategy, par2.strategy, par1.performance, par2.performance)
+                    off_strategy = llm.crossover(par1.strategy, par2.strategy)
                     crossover_individual = IndividualRMP(off_strategy)
                     individual_performance = crossover_individual.evaluate(collect_state, p1, p2, p1_skill_factor, p2_skill_factor, p1_fitness, p2_fitness, tasks)
                     if crossover_individual.performance >= par1.performance or crossover_individual.performance >= par2.performance:
@@ -141,7 +143,7 @@ class AdaptiveRMPMatrix(AbstractRMP):
                         off_list.append(reversed_individual)
 
                     if np.random.rand() < self.pm:
-                        off_strategy = llm.mutation(off_strategy, individual_performance)
+                        off_strategy = llm.mutation(off_strategy)
                         mutation_individual = IndividualRMP(off_strategy)
                         individual_performance = mutation_individual.evaluate(collect_state, p1, p2, p1_skill_factor, p2_skill_factor, p1_fitness, p2_fitness, tasks)
                     off_individual = IndividualRMP(off_strategy)
