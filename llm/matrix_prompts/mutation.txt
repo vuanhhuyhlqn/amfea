@@ -1,10 +1,9 @@
-I am using MFEA algorithm to optimize some different tasks. From the strategy below and its performance where performance is the percentage of offsprings that have better fitness than their parents, help me generate an mutation strategy that has 4 guide lines to create a RMP (Random Mating Probability) matrix using the following information:
+I am using MFEA algorithm to optimize some different tasks. From the strategy below, help me generate an mutation strategy that has 4 guide lines to create a RMP (Random Mating Probability) matrix using the following information:
 - 'task_count': The number of tasks.
 - 'pop_mean': A matrix of shape (task_count, indi_len), where each row represents the mean vector of the population for each task. It describes the average position of individuals in the search space per task.
 - 'pop_variance': A matrix of shape (task_count, indi_len), where each row represents the per-dimension variance of individuals in the population of each task. It describes the spread or diversity within each task.
 Strategy: 
 {0}
-Strategy's performance: {1}
 The new mutation strategy must:
 - Be based on the original strategy but introduce meaningful variations
 - Modify or extend one or more guide lines to encourage better exploration or adaptation
