@@ -82,11 +82,11 @@ class SBXCrossover(AbstractCrossover):
 		off_mut_fitness_1 = self.evaluate(off_mut_1, off_mut_skill_factor_1, tasks)
 		off_mut_fitness_2 = self.evaluate(off_mut_1, off_mut_skill_factor_2, tasks)
 
-		if eval:
-			p1_mut_fitness = p1_fitness[mutation_mask] #mutation parent 1
-			p2_mut_fitness = p2_fitness[mutation_mask] #mutation parent 2
-			better_off_cnt += np.sum(off_mut_fitness_1 < p1_mut_fitness)
-			better_off_cnt += np.sum(off_mut_fitness_2 < p2_mut_fitness)
+		# if eval:
+		# 	p1_mut_fitness = p1_fitness[mutation_mask] #mutation parent 1
+		# 	p2_mut_fitness = p2_fitness[mutation_mask] #mutation parent 2
+		# 	better_off_cnt += np.sum(off_mut_fitness_1 < p1_mut_fitness)
+		# 	better_off_cnt += np.sum(off_mut_fitness_2 < p2_mut_fitness)
 
 		off = np.concatenate([off, off_mut_1, off_mut_2])
 		off_skill_factor = np.concatenate([off_skill_factor, off_mut_skill_factor_1, off_mut_skill_factor_2])

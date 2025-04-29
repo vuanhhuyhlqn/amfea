@@ -1,6 +1,27 @@
 from openai import OpenAI
 from .AbstractModel import AbstractModel
 import json
+import time
+import threading
+
+# rate_limit_lock = threading.Lock()
+# last_call_time = 0
+
+# def rate_limited(calls_per_minute):
+#     interval = 60.0 / calls_per_minute
+#     def decorator(func):
+#         def wrapper(*args, **kwargs):
+#             global last_call_time
+#             with rate_limit_lock:
+#                 current_time = time.time()
+#                 wait_time = last_call_time + interval - current_time
+#                 if wait_time > 0:
+#                     time.sleep(wait_time)
+#                 result = func(*args, **kwargs)
+#                 last_call_time = time.time()
+#                 return result
+#         return wrapper
+#     return decorator
 
 init_file = open("llm/matrix_prompts/initial.txt", "r")
 init_text = init_file.read()
@@ -20,9 +41,9 @@ reverse_text = reverse_file.read()
 def split_prompts(response_content):
     try:
         data = json.loads(response_content)
-        strategies = data.get("strategies", [])
+        strategies = data.get("strategy", [])
         if not isinstance(strategies, list):
-            raise ValueError("Invalid format: 'strategies' should be a list.")
+            raise ValueError("Invalid format: 'strategy' should be a list.")
         return strategies
     except json.JSONDecodeError as e:
         print(f"Error decoding JSON: {e}")
@@ -43,10 +64,11 @@ class GPTModel(AbstractModel):
         self.temperature = temperature
         self.client = OpenAI(api_key=self.api_key)
 
-    def initial_strategies(self, num_strategies):
-        print("Creating {0} strategies".format(num_strategies))
+    # @rate_limited(4)
+    def initial_strategy(self):
+        print("Creating strategy")
 
-        init_prompt = init_text.format(num_strategies)
+        init_prompt = init_text
         # print(init_prompt)
 
         response = self.client.chat.completions.create(
@@ -60,13 +82,15 @@ class GPTModel(AbstractModel):
         )
         # print(response.choices[0].message.content)
 
-        strategies = split_prompts(response.choices[0].message.content)
-        return strategies
+        strategy = split_prompts(response.choices[0].message.content)
+        return strategy
     
+    # @rate_limited(4)
     def strategy_to_code(self, strategy):
         print("Creating code...")
-        create_prompt = create_text.format(strategy)
 
+        strategy_text = "\n".join(strategy)
+        create_prompt = create_text.format(strategy_text.strip())
         response = self.client.chat.completions.create(
             model = self.model,
             messages = [
@@ -81,9 +105,12 @@ class GPTModel(AbstractModel):
         code = clean_code_output(response.choices[0].message.content)
         return code
 
+    # @rate_limited(4)
     def crossover(self, p1_strategy, p2_strategy, p1_performance, p2_performance):
         print("Crossover...")
-        crossover_prompt = crossover_text.format(p1_strategy, p1_performance ,p2_strategy, p2_performance)
+        p1_stra_text = "\n".join(p1_strategy)
+        p2_stra_text = "\n".join(p2_strategy)
+        crossover_prompt = crossover_text.format(p1_stra_text.strip(), p1_performance ,p2_stra_text.strip(), p2_performance)
         # print(crossover_prompt)
 
         response = self.client.chat.completions.create(
@@ -97,11 +124,15 @@ class GPTModel(AbstractModel):
         )
         
         # print(response.choices[0].message.content)
-        return response.choices[0].message.content.strip()
+        crossover_strategy = split_prompts(response.choices[0].message.content)
+        return crossover_strategy
     
+    # @rate_limited(4)
     def mutation(self, strategy, performance):
         print("Mutation...")
-        mutation_prompt = mutation_text.format(strategy, performance)
+
+        stra_text = "\n".join(strategy)
+        mutation_prompt = mutation_text.format(stra_text.strip(), performance)
         # print(mutation_prompt)
 
         response = self.client.chat.completions.create(
@@ -114,11 +145,16 @@ class GPTModel(AbstractModel):
             stream = False
         )
 
-        return response.choices[0].message.content.strip()
+        # print(response.choices[0].message.content)
+        mutation_strategy = split_prompts(response.choices[0].message.content)
+        return mutation_strategy
     
+    # @rate_limited(4)
     def reverse(self, strategy):
         print("Reverse...")
-        reverse_prompt = reverse_text.format(strategy)
+
+        stra_text = "\n".join(strategy)
+        reverse_prompt = reverse_text.format(stra_text.strip())
         # print(reverse_prompt)
 
         response = self.client.chat.completions.create(
@@ -131,4 +167,6 @@ class GPTModel(AbstractModel):
             stream = False
         )
 
-        return response.choices[0].message.content.strip()
+        # print(response.choices[0].message.content)
+        reversed_strategy = split_prompts(response.choices[0].message.content)
+        return reversed_strategy

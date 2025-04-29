@@ -76,13 +76,16 @@ class AMFEA:
         p_fitness = self.fitness[p_indices]
         return p, p_skill_factor, p_fitness
 
-    def collect_population_state(self, gen, lookback):
+    def collect_population_state(self, gen, lookback, success_rate):
         state = {
             "task_count": self.num_tasks,
             "diversity": [],
             "convergence": [],
-            "task_similarity": []
-        }
+            "fitness_variance": [],
+            "offspring_success_rate": [],
+        }   
+
+        state["offspring_success_rate"] = success_rate
         
         for task_id in range(self.num_tasks):
             task_mask = self.skill_factor == task_id
@@ -97,6 +100,11 @@ class AMFEA:
                 diversity = 0.0
             state["diversity"].append(diversity)
 
+            task_fitness = self.fitness[task_mask]
+            fitness_var = np.var(task_fitness) if len(task_fitness) > 1 else 0.0
+            state["fitness_variance"].append(fitness_var)
+
+
             if len(self.bfs[task_id]) >= lookback + 1:
                 old_fitness = self.bfs[task_id][gen - lookback - 1]
                 new_fitness = self.bfs[task_id][gen - 1]
@@ -110,61 +118,44 @@ class AMFEA:
 
         # print("Diversity:" + str(state["diversity"]))
         # print("Convergence:" + str(state["convergence"]))
-
-        for i in range(self.num_tasks):
-            for j in range(i+1, self.num_tasks):
-                mask_i = self.skill_factor == i
-                mask_j = self.skill_factor == j
-                fitness_i = self.fitness[mask_i]
-                pop_i = self.pop[mask_i]
-                pop_j = self.pop[mask_j]
-                fitness_j = self.fitness[mask_j]
-
-                fitness_i_on_j = self.tasks[j].fitness(pop_i)
-                fitness_j_on_i = self.tasks[i].fitness(pop_j)
-
-                if len(fitness_i) == len(fitness_i_on_j) and len(fitness_j) == len(fitness_j_on_i):
-                    corr_i, _ = pearsonr(fitness_i, fitness_i_on_j) if len(fitness_i) > 1 else (0.0, 0.0)
-                    corr_j, _ = pearsonr(fitness_j, fitness_j_on_i) if len(fitness_j) > 1 else (0.0, 0.0)
-                    fitness_corr = max(corr_i, corr_j, 0.0)
-                else:
-                    fitness_corr = 0.0
-
-                best_idx_i = np.argmin(fitness_i) if len(fitness_i) > 0 else 0
-                best_idx_j = np.argmin(fitness_j) if len(fitness_j) > 0 else 0
-                best_ind_i = pop_i[best_idx_i] if len(pop_i) > 0 else np.zeros(self.indi_len)
-                best_ind_j = pop_j[best_idx_j] if len(pop_j) > 0 else np.zeros(self.indi_len)
-                solution_distance = np.linalg.norm(best_ind_i - best_ind_j)
-                max_distance = np.sqrt(self.indi_len)
-                solution_similarity = np.clip(1.0 - (solution_distance / max_distance), 0.0, 1.0)
-
-                similarity = 0.5 * fitness_corr + 0.5 * solution_similarity
-                state["task_similarity"].append((i, j, similarity))
-
-        # print("Task Similarity:" + str(state["task_similarity"]))
+        # print("Fitness variance:" + str(state["fitness_variance"]))
+        # print("Offspring success rate:" + str(state["offspring_success_rate"]))
 
         return state
 
     def evolve(self, gen, llm_rate, lookback):
-        num_pair_test = 10
-        p1, p2, p1_skill_factor, p2_skill_factor, p1_fitness, p2_fitness  = self.get_random_parents(num_pair_test)
-        
-        #Adaptive RMP
-        if gen != 0:
-            if gen % llm_rate == 0 or gen == lookback + 1:
-                collect_state = self.collect_population_state(gen, lookback)
-                self.armp_matrix = self.rmp(collect_state, p1, p2, p1_skill_factor, p2_skill_factor, p1_fitness, p2_fitness, gen, lookback, self.tasks)
-        
         #Crossover
         num_pair = self.pop_size #full
         p1, p2, p1_skill_factor, p2_skill_factor, p1_fitness, p2_fitness = self.get_random_parents(num_pair)
 
-        off, off_skill_factor, off_fitness = self.crossover(self.armp_matrix, p1, p2, 
+        eval = False
+        if gen != 0:
+            if gen % llm_rate == 0 or gen == lookback + 1:
+                eval = True
+
+        if eval:
+            off, off_skill_factor, off_fitness, better_off_cnt = self.crossover(self.armp_matrix, p1, p2, 
+                                                                                p1_skill_factor, 
+                                                                                p2_skill_factor, 
+                                                                                p1_fitness, 
+                                                                                p2_fitness,
+                                                                                self.tasks,
+                                                                                eval)
+            total_offspring = 2 * len(p1)
+            success_rate = better_off_cnt / total_offspring if total_offspring > 0 else 0.0
+        else:
+            off, off_skill_factor, off_fitness = self.crossover(self.armp_matrix, p1, p2, 
                                                p1_skill_factor, 
                                                p2_skill_factor, 
                                                p1_fitness, 
                                                p2_fitness,
                                                self.tasks)
+        
+        #Adaptive RMP
+        if gen != 0:
+            if gen % llm_rate == 0 or gen == lookback + 1:
+                collect_state = self.collect_population_state(gen, lookback, success_rate)
+                self.armp_matrix = self.rmp(collect_state, p1, p2, p1_skill_factor, p2_skill_factor, p1_fitness, p2_fitness, gen, lookback, self.tasks)
 
         ipop = np.concatenate([self.pop, off])
         iskill_factor = np.concatenate([self.skill_factor, off_skill_factor])

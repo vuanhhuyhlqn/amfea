@@ -1,12 +1,15 @@
-I am using MFEA algorithm to optimize some different tasks.Below is the two strategies to create a RMP (Random Mating Probability) matrix for crossover process and their performace.
-Strategy 1: {0}
+I am using MFEA algorithm to optimize some different tasks. Below is the two strategies to create a RMP (Random Mating Probability) matrix for crossover process and their performace.
+Strategy 1: 
+{0}
 Strategy 1's performance: {1}
-Strategy 2: {2}
+Strategy 2: 
+{2}
 Strategy 2's performance: {3}
 The performance of a strategy is the percentage of offsprings that have better fitness than their parents.
-Analyze these strategies and the differences between their performances and give me a new strategy to create the mentioned matrix with some information are task_count, diversity, convergence and task_similarity where:
+Analyze these strategies and the differences between their performances and give me a new strategy that has 4 guide lines to create the mentioned matrix using the following information:
 - 'task_count': Number of tasks
 - 'diversity': List of genetic diversity values for each task
 - 'convergence': List of convergence rates for each task
-- 'task_similarity': List of Wtuples (i, j, similarity) indicating similarity between tasks T_i and T_j (0 to 1)
-The strategy should not be too simple. The output strategy must consist of only 1 sentence and no more than 50 words, without any symbols or numbering.
+- 'fitness_variance': List of fitness variance values for each task
+- 'offspring_success_rate': The overall success rate of crossover offsprings have better fitness than their parents
+The strategy should not be too simple. Output must be a valid JSON object with the following format: {{ "strategy": [ "guide line 1", "guide line 2", "guide line 3", "guide line 4"] }}. Do not number the guide lines you create. Follow the format and do not give any further explain.
