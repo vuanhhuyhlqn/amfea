@@ -41,6 +41,7 @@ def get_2_tasks(ID: int) -> List[AbstractTask]:
     tasks = []
     task_names = ["CI_H", "CI_M", "CI_L", "PI_H", "PI_M", "PI_L", "NI_H", "NI_M", "NI_L"]
     task_name = task_names[ID]
+    print(task_name)
     if task_name == "CI_H":
         ci_h = loadmat(path + "/CEC17/Tasks/CI_H.mat")
         shift = ci_h['GO_Task1']
@@ -90,8 +91,8 @@ def get_2_tasks(ID: int) -> List[AbstractTask]:
         shift = pi_l['GO_Task1']
         rotation_matrix = pi_l['Rotation_Task1']
         tasks.append(CEC17Task(Ackley(50, shift, rotation_matrix), 50))
-        shift = ci_h['GO_Task2']
-        rotation_matrix = ci_h['Rotation_Task2']
+        shift = pi_l['GO_Task2']
+        rotation_matrix = pi_l['Rotation_Task2']
         tasks.append(CEC17Task(Weierstrass(25, shift, rotation_matrix), 0.5))
     
     if task_name == "NI_H":
@@ -102,11 +103,11 @@ def get_2_tasks(ID: int) -> List[AbstractTask]:
         tasks.append(CEC17Task(Rastrigin(50, shift, rotation_matrix), 50))
 
     if task_name == "NI_M":
-        ci_h = loadmat(path + "/CEC17/Tasks/NI_M.mat")
-        shift = ci_h['GO_Task1']
+        ni_m = loadmat(path + "/CEC17/Tasks/NI_M.mat")
+        shift = ni_m['GO_Task1']
         rotation_matrix = ci_h['Rotation_Task1']
         tasks.append(CEC17Task(Griewank(50, shift, rotation_matrix), 100))
-        shift = ci_h['GO_Task2']
+        shift = ni_m['GO_Task2']
         rotation_matrix = ci_h['Rotation_Task2']
         tasks.append(CEC17Task(Rastrigin(50, shift, rotation_matrix), 50))
 
