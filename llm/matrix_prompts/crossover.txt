@@ -7,9 +7,12 @@ Strategy 2:
 Strategy 2's performance: {3}
 The performance of a strategy is the percentage of offsprings that have better fitness than their parents.
 Analyze these strategies and the differences between their performances and give me a new strategy that has 4 guide lines to create the mentioned matrix using the following information:
-- 'task_count': Number of tasks
-- 'diversity': List of genetic diversity values for each task
-- 'convergence': List of convergence rates for each task
-- 'fitness_variance': List of fitness variance values for each task
-- 'offspring_success_rate': The overall success rate of crossover offsprings have better fitness than their parents
-The strategy should not be too simple. Output must be a valid JSON object with the following format: {{ "strategy": [ "guide line 1", "guide line 2", "guide line 3", "guide line 4"] }}. Do not number the guide lines you create. Follow the format and do not give any further explain.
+- 'task_count': The number of tasks.
+- 'pop_mean': A matrix of shape (task_count, indi_len), where each row represents the mean vector of the population for each task. It describes the average position of individuals in the search space per task.
+- 'pop_variance': A matrix of shape (task_count, indi_len), where each row represents the per-dimension variance of individuals in the population of each task. It describes the spread or diversity within each task.
+Each guide line should:
+- Use these statistics to assess **the similarity or difference between tasks** in terms of distribution in the search space.
+- Propose how RMP values between task pairs should be adjusted accordingly.
+- Be logically sound, non-trivial, and varied in perspective or criteria.
+- Avoid overly simple rules or generic statements.
+Output must be a valid JSON object with the following format: {{ "strategy": [ "guide line 1", "guide line 2", "guide line 3", "guide line 4"] }}. Do not number the guide lines. Follow the format and do not give any further explain.

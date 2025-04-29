@@ -1,9 +1,7 @@
-I am using MFEA algorithm to optimize some different tasks. From the strategy below and its performance where performance is the percentage of offsprings that have better fitness than their parents, please help me generate an mutation strategy that has 4 guide lines to create a RMP (Random Mating Probability) matrix using the following information:
-- 'task_count': Number of tasks
-- 'diversity': List of genetic diversity values for each task
-- 'convergence': List of convergence rates for each task
-- 'fitness_variance': List of fitness variance values for each task
-- 'offspring_success_rate': The overall success rate of crossover offsprings have better fitness than their parents
+I am using MFEA algorithm to optimize some different tasks. From the strategy below and its performance where performance is the percentage of offsprings that have better fitness than their parents, help me generate an mutation strategy that has 4 guide lines to create a RMP (Random Mating Probability) matrix using the following information:
+- 'task_count': The number of tasks.
+- 'pop_mean': A matrix of shape (task_count, indi_len), where each row represents the mean vector of the population for each task. It describes the average position of individuals in the search space per task.
+- 'pop_variance': A matrix of shape (task_count, indi_len), where each row represents the per-dimension variance of individuals in the population of each task. It describes the spread or diversity within each task.
 Strategy: 
 {0}
 Strategy's performance: {1}
@@ -12,4 +10,9 @@ The new mutation strategy must:
 - Modify or extend one or more guide lines to encourage better exploration or adaptation
 - Preserve part of the original logic or assumptions, but shift focus, thresholds, or priority if needed
 - Avoid simple rewording or cosmetic changes; ensure the result is a true variation with practical impact
-Output must be a valid JSON object with the following format: {{ "strategy": [ "guide line 1", "guide line 2", "guide line 3", "guide line 4"] }}. Do not number the guide lines you create. Follow the format and do not give any further explain.
+Each guide line should:
+- Use these statistics to assess **the similarity or difference between tasks** in terms of distribution in the search space.
+- Propose how RMP values between task pairs should be adjusted accordingly.
+- Be logically sound, non-trivial, and varied in perspective or criteria.
+- Avoid overly simple rules or generic statements.
+Output must be a valid JSON object with the following format: {{ "strategy": [ "guide line 1", "guide line 2", "guide line 3", "guide line 4"] }}. Do not number the guide lines. Follow the format and do not give any further explain.
