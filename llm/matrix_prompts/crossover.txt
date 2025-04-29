@@ -1,12 +1,9 @@
-I am using MFEA algorithm to optimize some different tasks. Below is the two strategies to create a RMP (Random Mating Probability) matrix for crossover process and their performace.
+I am using MFEA algorithm to optimize some different tasks. Below is the two strategies to create a RMP (Random Mating Probability) matrix for crossover process:
 Strategy 1: 
 {0}
-Strategy 1's performance: {1}
 Strategy 2: 
-{2}
-Strategy 2's performance: {3}
-The performance of a strategy is the percentage of offsprings that have better fitness than their parents.
-Analyze these strategies and the differences between their performances and give me a new strategy that has 4 guide lines to create the mentioned matrix using the following information:
+{1}
+Analyze these strategies, give me a new strategy that has 4 guide lines to create the mentioned matrix using the following information:
 - 'task_count': The number of tasks.
 - 'pop_mean': A matrix of shape (task_count, indi_len), where each row represents the mean vector of the population for each task. It describes the average position of individuals in the search space per task.
 - 'pop_variance': A matrix of shape (task_count, indi_len), where each row represents the per-dimension variance of individuals in the population of each task. It describes the spread or diversity within each task.
