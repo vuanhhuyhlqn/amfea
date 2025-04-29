@@ -117,6 +117,10 @@ class AdaptiveRMPMatrix(AbstractRMP):
         self.rmp_function = None
 
     def get_rmp(self, collect_state, p1, p2, p1_skill_factor, p2_skill_factor, p1_fitness, p2_fitness, gen_mfea, llm_rate, tasks):
+        print("Pop mean:")
+        print(collect_state["pop_mean"])
+        print("Pop variance:")
+        print(collect_state["pop_variance"])
         if gen_mfea % llm_rate == 0:
             if gen_mfea == 0:
                 self.rmp_pop.gen_pop(collect_state, p1, p2, p1_skill_factor, p2_skill_factor, p1_fitness, p2_fitness, tasks)
