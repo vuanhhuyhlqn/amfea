@@ -76,7 +76,7 @@ class AMFEA:
         p_fitness = self.fitness[p_indices]
         return p, p_skill_factor, p_fitness
 
-    def collect_population_state(self, gen, lookback, success_rate):
+    def collect_population_state(self, gen, lookback):
         state = {
             "task_count": self.num_tasks,
             "diversity": [],
@@ -85,7 +85,7 @@ class AMFEA:
             "offspring_success_rate": [],
         }   
 
-        state["offspring_success_rate"] = success_rate
+        # state["offspring_success_rate"] = success_rate
         
         for task_id in range(self.num_tasks):
             task_mask = self.skill_factor == task_id
@@ -126,8 +126,8 @@ class AMFEA:
     def get_prob_distrubtion(self):
         #shape = (skill_factor, dimension)
         #shape = (skill_factor, dimension)
-        mean = np.zeros(self.num_tasks, self.indi_len)
-        var = np.zeros(self.num_tasks, self.indi_len)
+        mean = np.zeros((self.num_tasks, self.indi_len))
+        var = np.zeros((self.num_tasks, self.indi_len))
 
         for task_id in range(self.num_tasks):
             task_mask = self.skill_factor == task_id
@@ -138,39 +138,26 @@ class AMFEA:
         return mean, var
 
 
-    def evolve(self, gen, llm_rate, lookback):
+    def evolve(self, gen, llm_rate):
         #Crossover
         num_pair = self.pop_size #full
         p1, p2, p1_skill_factor, p2_skill_factor, p1_fitness, p2_fitness = self.get_random_parents(num_pair)
 
-        eval = False
-        if gen != 0:
-            if gen % llm_rate == 0 or gen == lookback + 1:
-                eval = True
-
-        if eval:
-            off, off_skill_factor, off_fitness, better_off_cnt = self.crossover(self.armp_matrix, p1, p2, 
-                                                                                p1_skill_factor, 
-                                                                                p2_skill_factor, 
-                                                                                p1_fitness, 
-                                                                                p2_fitness,
-                                                                                self.tasks,
-                                                                                eval)
-            total_offspring = 2 * len(p1)
-            success_rate = better_off_cnt / total_offspring if total_offspring > 0 else 0.0
-        else:
-            off, off_skill_factor, off_fitness = self.crossover(self.armp_matrix, p1, p2, 
-                                               p1_skill_factor, 
-                                               p2_skill_factor, 
-                                               p1_fitness, 
-                                               p2_fitness,
-                                               self.tasks)
-        
+        off, off_skill_factor, off_fitness = self.crossover(self.armp_matrix, p1, p2, 
+                                            p1_skill_factor, 
+                                            p2_skill_factor, 
+                                            p1_fitness, 
+                                            p2_fitness,
+            
+                                            self.tasks)
         #Adaptive RMP
-        if gen != 0:
-            if gen % llm_rate == 0 or gen == lookback + 1:
-                collect_state = self.collect_population_state(gen, lookback, success_rate)
-                self.armp_matrix = self.rmp(collect_state, p1, p2, p1_skill_factor, p2_skill_factor, p1_fitness, p2_fitness, gen, lookback, self.tasks)
+        mean, variance = self.get_prob_distrubtion()
+        collect_state = {
+            "task_count": self.num_tasks,
+            "pop_mean": mean,
+            "pop_variance": variance
+        }
+        self.armp_matrix = self.rmp(collect_state, p1, p2, p1_skill_factor, p2_skill_factor, p1_fitness, p2_fitness, gen, llm_rate, self.tasks)
 
         ipop = np.concatenate([self.pop, off])
         iskill_factor = np.concatenate([self.skill_factor, off_skill_factor])
@@ -205,7 +192,7 @@ class AMFEA:
 
         for gen in range(num_gen + 1):
             start_time = time.time()
-            self.evolve(gen, llm_rate, lookback=10)
+            self.evolve(gen, llm_rate)
             end_time = time.time()
 
             if self.terminate:
