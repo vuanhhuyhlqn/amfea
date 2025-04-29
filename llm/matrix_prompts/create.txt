@@ -5,7 +5,7 @@ I'm using MFEA algorithm to optimize a number of different tasks. Help me genera
 The function must return a task_count x task_count Numpy matrix where:
 - RMP[i][i] = 1.0 for all i.
 - RMP[i][j] = RMP[j][i] for all i, j (symmetric matrix).
-- RMP[i][j] is in [0, 1] for all i, j.
+- RMP[i][j] must be in range [0, 1] for all i, j.
 The function must implement the following strategy: 
 {0}
 Output only valid Python code for the function, without any comments, explanations, or extra text. Do not modify the input parameters. Try to optimize using Numpy.
