@@ -1,11 +1,16 @@
-I'm using MFEA algorithm to optimize a number of different tasks. Help me generate a Python function named 'get_rmp_matrix' for crossover process that takes exactly 4 inputs: task_count, diversity, convergence, and task_similarity, where:
-- 'task_count': An integer specifying the number of tasks..
+I'm using MFEA algorithm to optimize a number of different tasks. Help me generate a Python function named 'get_rmp_matrix' for crossover process that takes exactly 5 inputs: task_count, diversity, convergence, fitness_variance, and offspring_success_rate, where:
+- 'task_count': An integer specifying the number of tasks.
 - 'diversity': A list of floats representing genetic diversity values for each task.
 - 'convergence': A list of floats representing convergence rates for each task.
-- 'task_similarity': A list of tuples (i, j, similarity) where i and j are integers (task indices) and similarity is a float (0 to 1) indicating similarity between tasks T_i and T_j.
+- 'fitness_variance': A list of floats representing the fitness variance of each task.
+- 'offspring_success_rate': A float value in [0, 1] indicating the overall success rate of crossover offspring over their parents in recent generation.
+
 The function must return a task_count x task_count Numpy matrix where:
 - RMP[i][i] = 1.0 for all i.
 - RMP[i][j] = RMP[j][i] for all i, j (symmetric matrix).
 - RMP[i][j] is in [0, 1] for all i, j.
-The function must implement the following strategy: {0}
+
+The function must implement the following strategy: 
+{0}
+
 Output only valid Python code for the function, without any comments, explanations, or extra text. Do not modify the input parameters. Try to optimize using Numpy.

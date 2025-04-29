@@ -38,7 +38,7 @@ class IndividualRMP:
 
     def evaluate(self, collect_state, p1, p2, p1_skill_factor, p2_skill_factor, p1_fitness, p2_fitness, tasks):
         print("Evaluating strategy")
-        print(f"Strategy: {self.strategy}")
+        print(f"Strategy:\n {"\n".join(self.strategy)}")
         rmp_function = llm.strategy_to_code(self.strategy)
         print(f"RMP function: {rmp_function}")
         try:
@@ -47,7 +47,8 @@ class IndividualRMP:
             rmp_matrix = f["get_rmp_matrix"](collect_state["task_count"],  
                                             collect_state["diversity"],
                                             collect_state["convergence"],
-                                            collect_state["task_similarity"])
+                                            collect_state["fitness_variance"],
+                                            collect_state["offspring_success_rate"])
             rmp_matrix = np.array(rmp_matrix)
             if not self.validate_rmp_matrix(rmp_matrix, len(tasks)):
                 print(f"Invalid RMP matrix generated, attempting to fix")
@@ -77,8 +78,8 @@ class PopulationRMP:
         self.individuals = []
 
     def gen_pop(self, collect_state, p1, p2, p1_skill_factor, p2_skill_factor, p1_fitness, p2_fitness, tasks):
-        strategies = llm.initial_strategies(self.pop_size)
-        for strategy in strategies:
+        for _ in range(self.pop_size):
+            strategy = llm.initial_strategy()
             individual = IndividualRMP(strategy)
             individual.evaluate(collect_state, p1, p2, p1_skill_factor, p2_skill_factor, p1_fitness, p2_fitness, tasks)
             self.individuals.append(individual)
@@ -123,8 +124,11 @@ class AdaptiveRMPMatrix(AbstractRMP):
             self.rmp_pop.individuals = self.rmp_pop.individuals[:self.rmp_pop_size]
 
         best_individual = self.rmp_pop.individuals[0]
-        print(best_individual.strategy)
-        print(best_individual.rmp_matrix)
+        print("End LLM")
+        print(f"Best strategy:\n {best_individual.strategy}")
+        print(f"Best performance: {best_individual.performance}")
+        print(f"Best RMP matrix:\n {best_individual.rmp_matrix}")
+        print("-------------------------------------------------")
         return best_individual.rmp_matrix
             
     def __call__(self, collect_state, p1, p2, p1_skill_factor, p2_skill_factor, p1_fitness, p2_fitness, gen, llm_rate, tasks):

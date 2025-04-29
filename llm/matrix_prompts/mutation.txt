@@ -1,8 +1,15 @@
-I am using MFEA algorithm to optimize some different tasks. From the strategy below and its performance where performance is the percentage of offsprings that have better fitness than their parents, please help me generate an mutation strategy to create a RMP (Random Mating Probability) matrix with some information are task_count, diversity, convergence and task_similarity where:
+I am using MFEA algorithm to optimize some different tasks. From the strategy below and its performance where performance is the percentage of offsprings that have better fitness than their parents, please help me generate an mutation strategy that has 4 guide lines to create a RMP (Random Mating Probability) matrix using the following information:
 - 'task_count': Number of tasks
 - 'diversity': List of genetic diversity values for each task
 - 'convergence': List of convergence rates for each task
-- 'task_similarity': List of Wtuples (i, j, similarity) indicating similarity between tasks T_i and T_j (0 to 1)
-Strategy: {0}
+- 'fitness_variance': List of fitness variance values for each task
+- 'offspring_success_rate': The overall success rate of crossover offsprings have better fitness than their parents
+Strategy: 
+{0}
 Strategy's performance: {1}
-The strategy should not be too simple. The output strategy must consist of only 1 sentence and no more than 50 words, without any symbols or numbering.
+The new mutation strategy must:
+- Be based on the original strategy but introduce meaningful variations
+- Modify or extend one or more guide lines to encourage better exploration or adaptation
+- Preserve part of the original logic or assumptions, but shift focus, thresholds, or priority if needed
+- Avoid simple rewording or cosmetic changes; ensure the result is a true variation with practical impact
+Output must be a valid JSON object with the following format: {{ "strategy": [ "guide line 1", "guide line 2", "guide line 3", "guide line 4"] }}. Do not number the guide lines you create. Follow the format and do not give any further explain.

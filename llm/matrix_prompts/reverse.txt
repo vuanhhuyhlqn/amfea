@@ -1,7 +1,13 @@
-I am using MFEA algorithm to optimize some different tasks. From the strategy below, help me generate an reversed strategy to create a RMP (Random Mating Probability) matrix with some information are task_count, diversity, convergence and task_similarity where:
+I am using MFEA algorithm to optimize some different tasks. From the strategy below, help me generate an reversed strategy that has 4 guide lines to create a RMP (Random Mating Probability) matrix using the following information:
 - 'task_count': Number of tasks
 - 'diversity': List of genetic diversity values for each task
 - 'convergence': List of convergence rates for each task
-- 'task_similarity': List of Wtuples (i, j, similarity) indicating similarity between tasks T_i and T_j (0 to 1)
+- 'fitness_variance': List of fitness variance values for each task
+- 'offspring_success_rate': The overall success rate of crossover offsprings have better fitness than their parents
 Strategy: {0}
-The strategy should not be too simple. The output strategy must consist of only 1 sentence and no more than 50 words, without any symbols or numbering.
+The reversed strategy must:
+- Oppose the reasoning or behavior in the original strategy
+- Shift priorities or thresholds in the opposite direction
+- Not be trivially reworded; the logic must be meaningfully reversed
+- Still be coherent and potentially useful under different population states
+Output must be a valid JSON object with the following format: {{ "strategy": [ "guide line 1", "guide line 2", "guide line 3", "guide line 4"] }}. Do not number the guide lines you create. Follow the format and do not give any further explain.
