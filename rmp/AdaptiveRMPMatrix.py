@@ -77,12 +77,14 @@ class IndividualRMP:
                     print(f"Fixed RMP matrix still invalid, using default")
                     rmp_matrix = np.full((len(tasks), len(tasks)), 0.3)
                     np.fill_diagonal(rmp_matrix, 1.0)
+                    self.performance = -1e9
+                    return self.performance
         except Exception as e:
             print(f"Error in creating RMP matrix: {e}")
             rmp_matrix = np.full((len(tasks), len(tasks)), 0.3)
             np.fill_diagonal(rmp_matrix, 1.0)
             self.rmp_matrix = rmp_matrix
-            self.performance = 0
+            self.performance = -1e9
             return self.performance
 
         self.rmp_matrix = rmp_matrix
