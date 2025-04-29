@@ -68,6 +68,7 @@ class SBXCrossover(AbstractCrossover):
 			assert(len(p_fitness) == len(off1_fitness))
 			assert(len(p_fitness) == len(off2_fitness))
 
+			assert(np.min(p_fitness) > 0)
 			diff1 = p_fitness - off1_fitness
 			diff_percentage1 = (diff1 / p_fitness) * 100
 
@@ -96,7 +97,9 @@ class SBXCrossover(AbstractCrossover):
 			diff1 = p1_fitness - off_mut_fitness_1
 			diff2 = p2_fitness - off_mut_fitness_2
 
-			diff_percentage1 = (diff1 / p1_fitness) * 100
+			assert(np.min(p1_fitness) > 0)
+			assert(np.min(p2_fitness) > 0)
+			diff_percentage1 = (diff1 / p1_fitness) * 100 
 			diff_percentage2 = (diff2 / p2_fitness) * 100
 
 			total_performance_diff += np.sum(diff_percentage1) + np.sum(diff_percentage2)
@@ -107,6 +110,7 @@ class SBXCrossover(AbstractCrossover):
 		assert(len(off) == len(off_skill_factor))
 		assert(len(off) == len(off_fitness))
 
+		assert(len(off) > 0)
 		avg_performance_diff = total_performance_diff / (len(off))
 		if eval:
 			return off, off_skill_factor, off_fitness, avg_performance_diff
