@@ -11,6 +11,25 @@ load_dotenv()
 GPT_API_KEY = os.getenv("GPT_API_KEY")
 
 llm = GPTModel(GPT_API_KEY, "gpt-3.5-turbo-0125", 0.7)
+
+def validate_rmp_matrix(rmp, task_count):
+    if not isinstance(rmp, np.ndarray) or rmp.shape != (task_count, task_count):
+        return False
+    if not np.all((rmp >= 0) & (rmp <= 1)):
+        return False
+    if not np.allclose(np.diagonal(rmp), 1.0, atol=1e-6):
+        return False
+    if not np.allclose(rmp, rmp.T, atol=1e-6):
+        return False
+    return True
+
+def fix_rmp_matrix(rmp, task_count):
+    if not isinstance(rmp, np.ndarray) or rmp.shape != (task_count, task_count):
+        rmp = np.full((task_count, task_count), 0.3)
+    rmp = np.clip(rmp, 0.0, 1.0)
+    rmp = np.maximum(rmp, rmp.T)
+    np.fill_diagonal(rmp, 1.0)
+    return rmp
 class IndividualRMP:
     def __init__(self, strategy):
         self.strategy = strategy
@@ -18,7 +37,7 @@ class IndividualRMP:
         self.rmp_matrix = None
         self.performance = None
 
-    def validate_rmp_matrix(self, rmp, task_count):
+    def validate_rmp_matrix(rmp, task_count):
         if not isinstance(rmp, np.ndarray) or rmp.shape != (task_count, task_count):
             return False
         if not np.all((rmp >= 0) & (rmp <= 1)):
@@ -29,7 +48,7 @@ class IndividualRMP:
             return False
         return True
 
-    def fix_rmp_matrix(self, rmp, task_count):
+    def fix_rmp_matrix(rmp, task_count):
         if not isinstance(rmp, np.ndarray) or rmp.shape != (task_count, task_count):
             rmp = np.full((task_count, task_count), 0.3)
         rmp = np.clip(rmp, 0.0, 1.0)
@@ -51,10 +70,10 @@ class IndividualRMP:
                                              collect_state["pop_mean"],  
                                             collect_state["pop_variance"])
             rmp_matrix = np.array(rmp_matrix)
-            if not self.validate_rmp_matrix(rmp_matrix, len(tasks)):
+            if not validate_rmp_matrix(rmp_matrix, len(tasks)):
                 print(f"Invalid RMP matrix generated, attempting to fix")
-                rmp_matrix = self.fix_rmp_matrix(rmp_matrix, len(tasks))
-                if not self.validate_rmp_matrix(rmp_matrix, len(tasks)):
+                rmp_matrix = fix_rmp_matrix(rmp_matrix, len(tasks))
+                if not validate_rmp_matrix(rmp_matrix, len(tasks)):
                     print(f"Fixed RMP matrix still invalid, using default")
                     rmp_matrix = np.full((len(tasks), len(tasks)), 0.3)
                     np.fill_diagonal(rmp_matrix, 1.0)
@@ -146,10 +165,10 @@ class AdaptiveRMPMatrix(AbstractRMP):
                                                 collect_state["pop_mean"],  
                                                 collect_state["pop_variance"])
                 rmp_matrix = np.array(rmp_matrix)
-                if not self.validate_rmp_matrix(rmp_matrix, len(tasks)):
+                if not validate_rmp_matrix(rmp_matrix, len(tasks)):
                     print(f"Invalid RMP matrix generated, attempting to fix")
-                    rmp_matrix = self.fix_rmp_matrix(rmp_matrix, len(tasks))
-                    if not self.validate_rmp_matrix(rmp_matrix, len(tasks)):
+                    rmp_matrix = fix_rmp_matrix(rmp_matrix, len(tasks))
+                    if not validate_rmp_matrix(rmp_matrix, len(tasks)):
                         print(f"Fixed RMP matrix still invalid, using default")
                         rmp_matrix = np.full((len(tasks), len(tasks)), 0.3)
                         np.fill_diagonal(rmp_matrix, 1.0)
