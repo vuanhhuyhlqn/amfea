@@ -123,6 +123,21 @@ class AMFEA:
 
         return state
 
+    def get_prob_distrubtion(self):
+        #shape = (skill_factor, dimension)
+        #shape = (skill_factor, dimension)
+        mean = np.zeros(self.num_tasks, self.indi_len)
+        var = np.zeros(self.num_tasks, self.indi_len)
+
+        for task_id in range(self.num_tasks):
+            task_mask = self.skill_factor == task_id
+            g = self.pop[task_mask]
+            mean[task_id] = np.mean(g, axis=0)
+            var[task_id] = np.var(g, axis=0)
+
+        return mean, var
+
+
     def evolve(self, gen, llm_rate, lookback):
         #Crossover
         num_pair = self.pop_size #full
