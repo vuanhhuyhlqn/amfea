@@ -140,8 +140,8 @@ class AMFEA:
 
     def get_fitness_prob_distribution(self):
         fit_mean = np.zeros(shape=self.num_tasks)
-        fit_var = np.zeros(shape=self.num_tasks)
-        for task_id in range(self.num_task):
+        fit_var = np.zeros(shape=self.num_tasks )
+        for task_id in range(self.num_tasks ):
             task_mask = self.skill_factor == task_id
             g_fitness = self.fitness[task_mask]
             fit_mean[task_id] = np.mean(g_fitness)

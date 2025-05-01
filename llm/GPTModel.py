@@ -91,6 +91,7 @@ class GPTModel(AbstractModel):
 
         strategy_text = "\n".join(strategy)
         create_prompt = create_text.format(strategy_text.strip())
+        # print(create_prompt)
         response = self.client.chat.completions.create(
             model = self.model,
             messages = [
