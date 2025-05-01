@@ -3,6 +3,8 @@ You are given the following input information:
 - 'task_count': The number of tasks.
 - 'pop_mean': A matrix of shape (task_count, indi_len), where each row represents the mean vector of the population for each task. It describes the average position of individuals in the search space per task.
 - 'pop_variance': A matrix of shape (task_count, indi_len), where each row represents the per-dimension variance of individuals in the population of each task. It describes the spread or diversity within each task.
+- 'fit_mean': A vector of shape (task_count,), where each element represents the average fitness of the population for each task.
+- 'fit_var': A vector of shape (task_count,), where each element represents the variance of fitness in the population for each task.
 Each guide line should:
 - Use these statistics to assess **the similarity or difference between tasks** in terms of distribution in the search space.
 - Propose how RMP values between task pairs should be adjusted accordingly.

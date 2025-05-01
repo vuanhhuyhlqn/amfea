@@ -162,10 +162,13 @@ class AMFEA:
                                             self.tasks)
         #Adaptive RMP
         mean, variance = self.get_prob_distribution()
+        fit_mean, fit_var = self.get_fitness_prob_distribution()
         collect_state = {
             "task_count": self.num_tasks,
             "pop_mean": mean,
-            "pop_variance": variance
+            "pop_variance": variance,
+            "fit_mean": fit_mean, 
+            "fit_var": fit_var
         }
         self.armp_matrix = self.rmp(collect_state, p1, p2, p1_skill_factor, p2_skill_factor, p1_fitness, p2_fitness, gen, llm_rate, self.tasks)
 

@@ -1,7 +1,9 @@
-I'm using MFEA algorithm to optimize a number of different tasks. Help me generate a Python function named 'get_rmp_matrix' for crossover process that takes exactly 3 inputs: task_count, pop_mean, pop_variance where:
+I'm using MFEA algorithm to optimize a number of different tasks. Help me generate a Python function named 'get_rmp_matrix' for crossover process that takes exactly 5 inputs: task_count, pop_mean, pop_variance, fit_mean, fit_var where:
 - 'task_count': The number of tasks.
 - 'pop_mean': A matrix of shape (task_count, indi_len), where each row represents the mean vector of the population for each task. It describes the average position of individuals in the search space per task.
 - 'pop_variance': A matrix of shape (task_count, indi_len), where each row represents the per-dimension variance of individuals in the population of each task. It describes the spread or diversity within each task.
+- 'fit_mean': A vector of shape (task_count,), where each element represents the average fitness of the population for each task.
+- 'fit_var': A vector of shape (task_count,), where each element represents the variance of fitness in the population for each task.
 The function must return a 2D NumPy matrix with shape (task_count, task_count) where:
 - RMP[i][i] = 1.0 for all i.
 - RMP[i][j] = RMP[j][i] for all i, j (symmetric matrix).
