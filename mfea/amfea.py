@@ -123,7 +123,7 @@ class AMFEA:
 
         return state
 
-    def get_prob_distrubtion(self):
+    def get_prob_distribution(self):
         #shape = (skill_factor, dimension)
         #shape = (skill_factor, dimension)
         mean = np.zeros((self.num_tasks, self.indi_len))
@@ -138,6 +138,16 @@ class AMFEA:
         return mean, var
 
 
+    def get_fitness_prob_distribution(self):
+        fit_mean = np.zeros(shape=self.num_tasks)
+        fit_var = np.zeros(shape=self.num_tasks)
+        for task_id in range(self.num_task):
+            task_mask = self.skill_factor == task_id
+            g_fitness = self.fitness[task_mask]
+            fit_mean[task_id] = np.mean(g_fitness)
+            fit_var[task_id] = np.var(g_fitness)
+        return fit_mean, fit_var
+
     def evolve(self, gen, llm_rate):
         #Crossover
         num_pair = self.pop_size #full
@@ -151,7 +161,7 @@ class AMFEA:
             
                                             self.tasks)
         #Adaptive RMP
-        mean, variance = self.get_prob_distrubtion()
+        mean, variance = self.get_prob_distribution()
         collect_state = {
             "task_count": self.num_tasks,
             "pop_mean": mean,
