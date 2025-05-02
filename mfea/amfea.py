@@ -5,6 +5,7 @@ from rmp import *
 from task import *
 from typing import List
 import time
+import random
 from scipy.stats import pearsonr
 
 class AMFEA:
@@ -189,7 +190,7 @@ class AMFEA:
             tfitness = ifitness[task_mask]
             assert(len(tpop) == len(tfitness))
 
-            survive_indices = np.argpartition(tfitness, survive_size - 1)[:survive_size]
+            survive_indices = np.argpartition(tfitness, survive_size)[:survive_size]
             
             self.best_fitness[task_id] = np.min(tfitness[survive_indices])
             self.mean_fitness[task_id] = np.mean(tfitness[survive_indices])
@@ -198,6 +199,14 @@ class AMFEA:
             self.fitness = np.concatenate([self.fitness, tfitness[survive_indices]])
             self.skill_factor = np.concatenate([self.skill_factor, np.full(survive_size, task_id)])
         
+        #shuffle
+        # indices = list(range(self.pop_size))
+        # random.shuffle(indices)
+        # self.pop = self.pop[indices]
+        # self.fitness = self.fitness[indices]
+        # self.skill_factor = self.skill_factor[indices]
+
+
     def fit(self, max_eval=1000000, num_gen=5000, monitor=False, monitor_rate=100, llm_rate=100):
         #History Data
         self.max_eval = max_eval

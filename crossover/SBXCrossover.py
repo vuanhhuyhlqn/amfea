@@ -36,7 +36,7 @@ class SBXCrossover(AbstractCrossover):
 
 		total_performance_diff = 0
 		avg_performance_diff = 0
-		
+
 		_p1 = p1[crossover_mask]
 		_p2 = p2[crossover_mask]
 		
@@ -44,28 +44,21 @@ class SBXCrossover(AbstractCrossover):
 		beta = np.zeros(_p1.shape)
 
 		mask1 = u < 0.5
-		# print(mask1)
 		beta[mask1] = (u[mask1] * 2) ** (1 / (self.eta + 1))
 		mask2 = np.invert(mask1)
 		beta[mask2] = (2 * (1 - u[mask2])) ** ((-1) / (self.eta + 1))
-
-		# new_beta_shape = (_p1.shape[0], _p1.shape[1])
-		# new_beta_strides = (beta.strides[0], 0)
-
-		# nbeta = np.lib.stride_tricks.as_strided(beta, new_beta_shape, new_beta_strides)
-		# off1 = 0.5 * ((1 + nbeta) * _p1 + (1 - nbeta) * _p2)
-		# off2 = 0.5 * ((1 - nbeta) * _p1 + (1 + nbeta) * _p2)
 
 		off1 = 0.5 * ((1 + beta) * _p1 + (1 - beta) * _p2)
 		off2 = 0.5 * ((1 - beta) * _p1 + (1 + beta) * _p2)
 
 		off1 = np.clip(off1, a_min=0, a_max=1)
 		off2 = np.clip(off2, a_min=0, a_max=1)
-
+		
 		assert(np.max(off1) <= 1.0)
 		assert(np.max(off2) <= 1.0)
+		
 		off1_skill_factor = p1_skill_factor[crossover_mask]
-		off2_skill_factor = p1_skill_factor[crossover_mask]
+		off2_skill_factor = p2_skill_factor[crossover_mask]
 		off1_fitness = self.evaluate(off1, off1_skill_factor, tasks)
 		off2_fitness = self.evaluate(off2, off2_skill_factor, tasks)
 
@@ -88,6 +81,7 @@ class SBXCrossover(AbstractCrossover):
 		off_fitness = np.concatenate([off1_fitness, off2_fitness])
 
 		mutation_mask = np.invert(crossover_mask)
+		# print(mutation_mask)
 		_p1_mutation = p1[mutation_mask]
 		_p2_mutation = p2[mutation_mask]
 		off_mut_1, off_mut_skill_factor_1 = self.mutation(_p1_mutation, p1_skill_factor[mutation_mask])
