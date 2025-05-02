@@ -150,17 +150,9 @@ class AMFEA:
 
     def evolve(self, gen, llm_rate):
         #Crossover
-        num_pair = self.pop_size #full
+        num_pair = int(self.pop_size / 2) 
         p1, p2, p1_skill_factor, p2_skill_factor, p1_fitness, p2_fitness = self.get_random_parents(num_pair)
 
-        off, off_skill_factor, off_fitness = self.crossover(self.armp_matrix, p1, p2, 
-                                            p1_skill_factor, 
-                                            p2_skill_factor, 
-                                            p1_fitness, 
-                                            p2_fitness,
-            
-                                            self.tasks)
-        #Adaptive RMP
         mean, variance = self.get_prob_distribution()
         fit_mean, fit_var = self.get_fitness_prob_distribution()
         collect_state = {
@@ -171,6 +163,15 @@ class AMFEA:
             "fit_var": fit_var
         }
         self.armp_matrix = self.rmp(collect_state, p1, p2, p1_skill_factor, p2_skill_factor, p1_fitness, p2_fitness, gen, llm_rate, self.tasks)
+        
+
+        off, off_skill_factor, off_fitness = self.crossover(self.armp_matrix, p1, p2, 
+                                            p1_skill_factor, 
+                                            p2_skill_factor, 
+                                            p1_fitness, 
+                                            p2_fitness,
+            
+                                            self.tasks)
 
         ipop = np.concatenate([self.pop, off])
         iskill_factor = np.concatenate([self.skill_factor, off_skill_factor])

@@ -14,4 +14,4 @@ Each guide line should:
 - Propose how RMP values between task pairs should be adjusted accordingly.
 - Be logically sound, non-trivial, and varied in perspective or criteria.
 - Avoid overly simple rules or generic statements.
-Output must be a valid JSON object with the following format: {{ "strategy": [ "guide line 1", "guide line 2", "guide line 3", "guide line 4"] }}. Do not number the guide lines. Follow the format and do not give any further explain.
+Output must be a valid JSON object with the following format: {{ "strategy": [ "guide line 1", "guide line 2", "guide line 3", "guide line 4", "guide line 5"] }}. Do not number the guide lines. Follow the format and do not give any further explain.
