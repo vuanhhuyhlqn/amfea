@@ -118,4 +118,4 @@ def get_2_tasks(ID: int) -> List[AbstractTask]:
         tasks.append(CEC17Task(Rastrigin(50, shift, rotation_matrix), 50))
         tasks.append(CEC17Task(Schwefel(50, shift, rotation_matrix), 500))
     
-    return tasks
+    return tasks, task_name
