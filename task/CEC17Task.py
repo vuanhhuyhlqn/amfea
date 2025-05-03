@@ -105,10 +105,10 @@ def get_2_tasks(ID: int) -> List[AbstractTask]:
     if task_name == "NI_M":
         ni_m = loadmat(path + "/CEC17/Tasks/NI_M.mat")
         shift = ni_m['GO_Task1']
-        rotation_matrix = ci_h['Rotation_Task1']
+        rotation_matrix = ni_m['Rotation_Task1']
         tasks.append(CEC17Task(Griewank(50, shift, rotation_matrix), 100))
         shift = ni_m['GO_Task2']
-        rotation_matrix = ci_h['Rotation_Task2']
+        rotation_matrix = ni_m['Rotation_Task2']
         tasks.append(CEC17Task(Rastrigin(50, shift, rotation_matrix), 50))
 
     if task_name == "NI_L":
