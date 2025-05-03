@@ -1,5 +1,5 @@
 import numpy as np
-from numba import jit
+from numby import jit
 
 class AbstractTask:
     def __init__(self):
