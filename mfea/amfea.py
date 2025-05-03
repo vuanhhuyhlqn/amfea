@@ -31,7 +31,7 @@ class AMFEA:
         self.bfs = None
 
         #stopping criteria
-        self.eval_cnt = 0
+        self.eval_cnt = self.pop_size
         self.max_eval = 0
 
         for i in range(self.pop_size):
@@ -123,6 +123,8 @@ class AMFEA:
                                             p2_fitness,
             
                                             self.tasks)
+
+        self.eval_cnt += len(off)
 
         ipop = np.concatenate([self.pop, off])
         iskill_factor = np.concatenate([self.skill_factor, off_skill_factor])

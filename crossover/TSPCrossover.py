@@ -42,17 +42,17 @@ class TSPCrossover(AbstractCrossover):
 		l = _p1.shape[1]
 
 		off1 = _p1.copy()
-		num_swap_pos = int(l / 2)
+		num_swap_pos = int(l / 4)
 		t = np.arange(len(off1), dtype=np.int32) # t = [0, 1, 2, ... (len(off1) - 1)]
 		row_indices = np.lib.stride_tricks.as_strided(t, shape=(len(off1), num_swap_pos), strides=(4, 0))
-		swap_pos = np.random.randint(0, self.indi_len, size=(len(off1), num_swap_pos))
+		swap_pos = np.random.randint(0, l, size=(len(off1), num_swap_pos))
 		off1[row_indices, swap_pos] = _p2[row_indices, swap_pos]
 		
 		off2 = _p2.copy()
-		num_swap_pos = int(l / 2)
+		num_swap_pos = int(l / 4)
 		t = np.arange(len(off2), dtype=np.int32) # t = [0, 1, 2, ... (len(off2) - 1)]
 		row_indices = np.lib.stride_tricks.as_strided(t, shape=(len(off2), num_swap_pos), strides=(4, 0))
-		swap_pos = np.random.randint(0, self.indi_len, size=(len(off2), num_swap_pos))
+		swap_pos = np.random.randint(0, l, size=(len(off2), num_swap_pos))
 		off2[row_indices, swap_pos] = _p1[row_indices, swap_pos]
 
 		off1 = np.clip(off1, a_min=0, a_max=1)
