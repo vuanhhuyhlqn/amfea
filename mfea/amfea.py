@@ -104,7 +104,7 @@ class AMFEA:
 
     def evolve(self, gen, llm_rate):
         #Crossover
-        num_pair = int(self.pop_size) 
+        num_pair = int(self.pop_size / 2) 
         p1, p2, p1_skill_factor, p2_skill_factor, p1_fitness, p2_fitness = self.get_random_parents(num_pair)
 
         mean, variance = self.get_prob_distribution()
