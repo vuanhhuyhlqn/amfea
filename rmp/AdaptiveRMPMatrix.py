@@ -68,9 +68,7 @@ class IndividualRMP:
             exec(rmp_function, f)
             rmp_matrix = f["get_rmp_matrix"](collect_state["task_count"],
                                              collect_state["pop_mean"],  
-                                            collect_state["pop_variance"],
-                                            collect_state["fit_mean"],
-                                            collect_state["fit_var"])
+                                            collect_state["pop_variance"])
             rmp_matrix = np.array(rmp_matrix)
             if not validate_rmp_matrix(rmp_matrix, len(tasks)):
                 print(f"Invalid RMP matrix generated, attempting to fix")

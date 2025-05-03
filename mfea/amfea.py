@@ -77,53 +77,6 @@ class AMFEA:
         p_fitness = self.fitness[p_indices]
         return p, p_skill_factor, p_fitness
 
-    def collect_population_state(self, gen, lookback):
-        state = {
-            "task_count": self.num_tasks,
-            "diversity": [],
-            "convergence": [],
-            "fitness_variance": [],
-            "offspring_success_rate": [],
-        }   
-
-        # state["offspring_success_rate"] = success_rate
-        
-        for task_id in range(self.num_tasks):
-            task_mask = self.skill_factor == task_id
-            task_pop = self.pop[task_mask]
-
-            if len(task_pop) > 1:
-                distances = [np.linalg.norm(task_pop[i] - task_pop[j]) 
-                            for i in range(len(task_pop)) 
-                            for j in range(i+1, len(task_pop))]
-                diversity = np.mean(distances) if distances else 0.0
-            else:
-                diversity = 0.0
-            state["diversity"].append(diversity)
-
-            task_fitness = self.fitness[task_mask]
-            fitness_var = np.var(task_fitness) if len(task_fitness) > 1 else 0.0
-            state["fitness_variance"].append(fitness_var)
-
-
-            if len(self.bfs[task_id]) >= lookback + 1:
-                old_fitness = self.bfs[task_id][gen - lookback - 1]
-                new_fitness = self.bfs[task_id][gen - 1]
-                if old_fitness != 0 and old_fitness != float('inf'):
-                    convergence = (old_fitness - new_fitness) / abs(old_fitness)
-                else:
-                    convergence = 0.0
-            else:
-                convergence = 0.0
-            state["convergence"].append(convergence)
-
-        # print("Diversity:" + str(state["diversity"]))
-        # print("Convergence:" + str(state["convergence"]))
-        # print("Fitness variance:" + str(state["fitness_variance"]))
-        # print("Offspring success rate:" + str(state["offspring_success_rate"]))
-
-        return state
-
     def get_prob_distribution(self):
         #shape = (skill_factor, dimension)
         #shape = (skill_factor, dimension)
@@ -155,13 +108,10 @@ class AMFEA:
         p1, p2, p1_skill_factor, p2_skill_factor, p1_fitness, p2_fitness = self.get_random_parents(num_pair)
 
         mean, variance = self.get_prob_distribution()
-        fit_mean, fit_var = self.get_fitness_prob_distribution()
         collect_state = {
             "task_count": self.num_tasks,
             "pop_mean": mean,
-            "pop_variance": variance,
-            "fit_mean": fit_mean, 
-            "fit_var": fit_var
+            "pop_variance": variance
         }
         self.armp_matrix = self.rmp(collect_state, p1, p2, p1_skill_factor, p2_skill_factor, p1_fitness, p2_fitness, gen, llm_rate, self.tasks)
         
