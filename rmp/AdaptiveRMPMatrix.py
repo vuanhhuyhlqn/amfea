@@ -57,12 +57,12 @@ class IndividualRMP:
         return rmp
 
     def evaluate(self, collect_state, p1, p2, p1_skill_factor, p2_skill_factor, p1_fitness, p2_fitness, tasks):
-        print("Evaluating strategy")
+        # print("Evaluating strategy")
         strategy_text = "\n".join(self.strategy)
-        print("Strategy: \n" + strategy_text)
+        # print("Strategy: \n" + strategy_text)
         rmp_function = llm.strategy_to_code(self.strategy)
         self.rmp_function = rmp_function
-        print(f"RMP function: {rmp_function}")
+        # print(f"RMP function: {rmp_function}")
         try:
             f = {}
             exec(rmp_function, f)
@@ -71,16 +71,16 @@ class IndividualRMP:
                                             collect_state["pop_variance"])
             rmp_matrix = np.array(rmp_matrix)
             if not validate_rmp_matrix(rmp_matrix, len(tasks)):
-                print(f"Invalid RMP matrix generated, attempting to fix")
+                # print(f"Invalid RMP matrix generated, attempting to fix")
                 rmp_matrix = fix_rmp_matrix(rmp_matrix, len(tasks))
                 if not validate_rmp_matrix(rmp_matrix, len(tasks)):
-                    print(f"Fixed RMP matrix still invalid, using default")
+                    # print(f"Fixed RMP matrix still invalid, using default")
                     rmp_matrix = np.full((len(tasks), len(tasks)), 0.3)
                     np.fill_diagonal(rmp_matrix, 1.0)
                     self.performance = -1e9
                     return self.performance
         except Exception as e:
-            print(f"Error in creating RMP matrix: {e}")
+            # print(f"Error in creating RMP matrix: {e}")
             rmp_matrix = np.full((len(tasks), len(tasks)), 0.3)
             np.fill_diagonal(rmp_matrix, 1.0)
             self.rmp_matrix = rmp_matrix
@@ -88,12 +88,12 @@ class IndividualRMP:
             return self.performance
 
         self.rmp_matrix = rmp_matrix
-        print(self.rmp_matrix)
+        # print(self.rmp_matrix)
         mutation = PolynomialMutation(5, 0.02)
         crossover = SBXCrossover(mutation, eta=2)
         _, _, _, avg_performance_diff = crossover(self.rmp_matrix, p1, p2, p1_skill_factor, p2_skill_factor, p1_fitness, p2_fitness, eval=True, tasks=tasks)
         self.performance = avg_performance_diff
-        print(f"Performance: {self.performance}")
+        # print(f"Performance: {self.performance}")
 
         return self.performance
 class PopulationRMP:
@@ -156,11 +156,11 @@ class AdaptiveRMPMatrix(AbstractRMP):
 
             best_individual = self.rmp_pop.individuals[0]
             self.rmp_function = best_individual.rmp_function
-            print("End LLM")
-            print(f"Best strategy:\n {best_individual.strategy}")
-            print(f"Best performance: {best_individual.performance}")
-            print(f"Best RMP matrix:\n {best_individual.rmp_matrix}")
-            print("-------------------------------------------------")
+            # print("End LLM")
+            # print(f"Best strategy:\n {best_individual.strategy}")
+            # print(f"Best performance: {best_individual.performance}")
+            # print(f"Best RMP matrix:\n {best_individual.rmp_matrix}")
+            # print("-------------------------------------------------")
 
             return best_individual.rmp_matrix
         else:
@@ -174,19 +174,19 @@ class AdaptiveRMPMatrix(AbstractRMP):
                                                 collect_state["fit_var"])
                 rmp_matrix = np.array(rmp_matrix)
                 if not validate_rmp_matrix(rmp_matrix, len(tasks)):
-                    print(f"Invalid RMP matrix generated, attempting to fix")
+                    # print(f"Invalid RMP matrix generated, attempting to fix")
                     rmp_matrix = fix_rmp_matrix(rmp_matrix, len(tasks))
                     if not validate_rmp_matrix(rmp_matrix, len(tasks)):
-                        print(f"Fixed RMP matrix still invalid, using default")
+                        # print(f"Fixed RMP matrix still invalid, using default")
                         rmp_matrix = np.full((len(tasks), len(tasks)), 0.3)
                         np.fill_diagonal(rmp_matrix, 1.0)
             except Exception as e:
-                print(f"Error in creating RMP matrix: {e}")
+                # print(f"Error in creating RMP matrix: {e}")
                 rmp_matrix = np.full((len(tasks), len(tasks)), 0.3)
                 np.fill_diagonal(rmp_matrix, 1.0)
             
-            print("RMP_Matrix:")
-            print(rmp_matrix)
+            # print("RMP_Matrix:")
+            # print(rmp_matrix)
             return rmp_matrix
             
     def __call__(self, collect_state, p1, p2, p1_skill_factor, p2_skill_factor, p1_fitness, p2_fitness, gen, llm_rate, tasks):

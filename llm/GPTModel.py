@@ -66,7 +66,7 @@ class GPTModel(AbstractModel):
 
     # @rate_limited(4)
     def initial_strategy(self):
-        print("Creating strategy")
+        # print("Creating strategy")
 
         init_prompt = init_text
         # print(init_prompt)
@@ -87,7 +87,7 @@ class GPTModel(AbstractModel):
     
     # @rate_limited(4)
     def strategy_to_code(self, strategy):
-        print("Creating code...")
+        # print("Creating code...")
 
         strategy_text = "\n".join(strategy)
         create_prompt = create_text.format(strategy_text.strip())
@@ -108,7 +108,7 @@ class GPTModel(AbstractModel):
 
     # @rate_limited(4)
     def crossover(self, p1_strategy, p2_strategy):
-        print("Crossover...")
+        # print("Crossover...")
         p1_stra_text = "\n".join(p1_strategy)
         p2_stra_text = "\n".join(p2_strategy)
         crossover_prompt = crossover_text.format(p1_stra_text, p2_stra_text)
@@ -130,7 +130,7 @@ class GPTModel(AbstractModel):
     
     # @rate_limited(4)
     def mutation(self, strategy):
-        print("Mutation...")
+        # print("Mutation...")
 
         stra_text = "\n".join(strategy)
         mutation_prompt = mutation_text.format(stra_text)
@@ -152,7 +152,7 @@ class GPTModel(AbstractModel):
     
     # @rate_limited(4)
     def reverse(self, strategy):
-        print("Reverse...")
+        # print("Reverse...")
 
         stra_text = "\n".join(strategy)
         reverse_prompt = reverse_text.format(stra_text.strip())
